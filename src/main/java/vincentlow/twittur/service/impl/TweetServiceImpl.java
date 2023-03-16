@@ -1,5 +1,7 @@
 package vincentlow.twittur.service.impl;
 
+import static vincentlow.twittur.utils.ValidatorUtil.validateAccount;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,9 +15,12 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
+import vincentlow.twittur.model.response.exception.InternalServerErrorException;
+import vincentlow.twittur.model.response.exception.NotFoundException;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.repository.TweetRepository;
 import vincentlow.twittur.service.AccountService;
@@ -23,6 +28,8 @@ import vincentlow.twittur.service.TweetService;
 
 @Service
 public class TweetServiceImpl implements TweetService {
+
+  private final String DUMMY_REQUESTS_PATH = "dummy_requests/tweets.json";
 
   @Autowired
   private AccountService accountService;
@@ -37,15 +44,16 @@ public class TweetServiceImpl implements TweetService {
   public Page<Tweet> findAccountTweets(String username, int pageNumber, int pageSize) {
 
     Account account = accountService.findAccountByUsername(username);
-    return tweetRepository.findAllByCreatorId(account.getId(), PageRequest.of(pageNumber, pageSize));
+    return tweetRepository.findAllByCreatorId(validateAccount(account).getId(), PageRequest.of(pageNumber, pageSize));
   }
 
   @Override
   public Tweet findAccountTweetById(String username, String tweetId) {
 
     Account account = accountService.findAccountByUsername(username);
+    validateAccount(account);
     return tweetRepository.findById(tweetId)
-        .orElse(null);
+        .orElseThrow(() -> new NotFoundException(ExceptionMessage.TWEET_NOT_FOUND));
   }
 
   @Override
@@ -54,6 +62,8 @@ public class TweetServiceImpl implements TweetService {
     Tweet tweet = convertToTweet(request);
 
     Account account = accountService.findAccountByUsername(username);
+    validateAccount(account);
+
     tweet.setCreator(account);
     tweet.setCreatedBy(account.getId());
     tweet.setUpdatedBy(account.getId());
@@ -68,7 +78,7 @@ public class TweetServiceImpl implements TweetService {
   public void initDummyTweets(String username) {
 
     ObjectMapper mapper = new ObjectMapper();
-    ClassPathResource requestJson = new ClassPathResource("dummy_requests/tweets.json");
+    ClassPathResource requestJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
     Account account = accountService.findAccountByUsername(username);
 
@@ -88,7 +98,7 @@ public class TweetServiceImpl implements TweetService {
       account.setTweetsCount(account.getTweetsCount() + saved.size());
       accountRepository.save(account);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new InternalServerErrorException(ExceptionMessage.FAILED_TO_READ_JSON_FILE);
     }
   }
 

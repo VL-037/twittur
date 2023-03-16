@@ -2,6 +2,8 @@ package vincentlow.twittur.model.response.api;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import vincentlow.twittur.model.response.BaseResponse;
@@ -16,6 +18,13 @@ public class ApiListResponse<T extends BaseResponse> extends ApiResponse {
   private List<T> content;
 
   private PageMetaData pageMetaData;
+
+  public ApiListResponse(HttpStatus httpStatus, String error, List<T> content, PageMetaData pageMetaData) {
+
+    super(httpStatus, error);
+    this.content = content;
+    this.pageMetaData = pageMetaData;
+  }
 
   @Override
   public String toString() {

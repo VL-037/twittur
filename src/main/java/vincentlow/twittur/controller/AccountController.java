@@ -1,6 +1,7 @@
 package vincentlow.twittur.controller;
 
 import static vincentlow.twittur.utils.ObjectMappingHelper.toResponse;
+import static vincentlow.twittur.utils.ValidatorUtil.validatePageableRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,19 +44,23 @@ public class AccountController extends BaseController {
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize) {
 
+    validatePageableRequest(pageNumber, pageSize);
+
     Page<Account> accounts = accountService.findAccounts(pageNumber, pageSize);
     List<AccountResponse> response = accounts.stream()
         .map(account -> toResponse(account, AccountResponse.class))
         .collect(Collectors.toList());
     PageMetaData pageMetaData = getPageMetaData(accounts, pageNumber, pageSize);
 
-    return toApiResponse(response, pageMetaData);
+    return toSuccessApiResponse(response, pageMetaData);
   }
 
   @GetMapping("/@{username}")
   public ApiSingleResponse<AccountResponse> getAccountByUsername(@PathVariable("username") String username,
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize) {
+
+    validatePageableRequest(pageNumber, pageSize);
 
     Account account = accountService.findAccountByUsername(username);
     Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
@@ -68,7 +73,7 @@ public class AccountController extends BaseController {
         .collect(Collectors.toList());
     response.setTweets(tweetResponses);
 
-    return toApiResponse(response);
+    return toSuccessApiResponse(response);
   }
 
   @PostMapping
@@ -77,7 +82,7 @@ public class AccountController extends BaseController {
 
     Account account = accountService.createAccount(request);
     AccountResponse response = toResponse(account, AccountResponse.class);
-    return toApiResponse(response);
+    return toSuccessApiResponse(response);
   }
 
   @PostMapping("/init")

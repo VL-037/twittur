@@ -3,11 +3,15 @@ package vincentlow.twittur.model.request;
 import java.io.Serializable;
 import java.sql.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateAccountRequest implements Serializable {
 
   private static final long serialVersionUID = 1742974303828086822L;

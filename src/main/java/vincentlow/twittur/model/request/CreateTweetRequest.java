@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor // needed when req field = 1
-@AllArgsConstructor
+@AllArgsConstructor // used in mapper.readValue()
 public class CreateTweetRequest implements Serializable {
 
   private static final long serialVersionUID = 735161378073457820L;

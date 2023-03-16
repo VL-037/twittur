@@ -43,7 +43,7 @@ public class TweetController extends BaseController {
         .collect(Collectors.toList());
     PageMetaData pageMetaData = getPageMetaData(tweets, pageNumber, pageSize);
 
-    return toApiResponse(response, pageMetaData);
+    return toSuccessApiResponse(response, pageMetaData);
   }
 
   @GetMapping("/{tweetId}")
@@ -53,7 +53,7 @@ public class TweetController extends BaseController {
     Tweet tweet = tweetService.findAccountTweetById(username, tweetId);
     TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-    return toApiResponse(response);
+    return toSuccessApiResponse(response);
   }
 
   @PostMapping
@@ -63,7 +63,7 @@ public class TweetController extends BaseController {
     Tweet tweet = tweetService.createTweet(username, request);
     TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-    return toApiResponse(response);
+    return toSuccessApiResponse(response);
   }
 
   @PostMapping("/init")

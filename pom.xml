@@ -16,13 +16,6 @@
 
 	<properties>
 		<java.version>17</java.version>
-
-		<!--FLYWAY-->
-		<flyway.user>postgres</flyway.user>
-		<flyway.password>postgres</flyway.password>
-		<flyway.schemas>twittur</flyway.schemas>
-		<flyway.url>twittur</flyway.url>
-		<flyway.locations>twittur</flyway.locations>
 	</properties>
 
 	<dependencies>

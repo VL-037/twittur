@@ -1,5 +1,6 @@
 package vincentlow.twittur.service.impl;
 
+import static vincentlow.twittur.utils.ValidatorUtil.validateAccount;
 import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
@@ -23,15 +24,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.micrometer.common.util.StringUtils;
 import vincentlow.twittur.model.constant.ErrorCode;
+import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.response.exception.InternalServerErrorException;
 import vincentlow.twittur.repository.AccountRepository;
-import vincentlow.twittur.repository.TweetRepository;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
 
 @Service
 public class AccountServiceImpl implements AccountService {
+  
+  private final String DUMMY_REQUESTS_PATH = "dummy_requests/accounts.json";
 
   @Autowired
   private AccountRepository accountRepository;
@@ -45,7 +49,8 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Account findAccountByUsername(String username) {
 
-    return accountRepository.findByUsername(username);
+    Account account = accountRepository.findByUsername(username);
+    return validateAccount(account);
   }
 
   @Override
@@ -84,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
   public void initDummyAccounts() {
 
     ObjectMapper mapper = new ObjectMapper();
-    ClassPathResource accountJson = new ClassPathResource("dummy_requests/accounts.json");
+    ClassPathResource accountJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
     try {
       List<CreateAccountRequest> requests = mapper.readValue(accountJson.getInputStream(), new TypeReference<>() {});
@@ -93,7 +98,7 @@ public class AccountServiceImpl implements AccountService {
           .collect(Collectors.toList());
       accountRepository.saveAll(accounts);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new InternalServerErrorException(ExceptionMessage.FAILED_TO_READ_JSON_FILE);
     }
   }
 
