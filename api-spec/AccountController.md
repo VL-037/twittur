@@ -100,7 +100,7 @@
 }
 ```
 
-- response sample &arr; empty `content`
+- response sample &rarr; empty `content`
 
 ```json
 {
@@ -113,6 +113,16 @@
     "pageSize": 10,
     "totalRecords": 0
   }
+}
+```
+
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
 }
 ```
 
@@ -258,13 +268,23 @@
 }
 ```
 
-- response sample &arr; `username` not found
+- response sample &rarr; `username` not found
 
 ```json
 {
   "code": 404,
   "status": "NOT_FOUND",
   "error": "account not found"
+}
+```
+
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
 }
 ```
 
@@ -324,16 +344,6 @@
 }
 ```
 
-- response sample &rarr; `username` taken
-
-```json
-{
-  "code": 409,
-  "status": "CONFLICT",
-  "error": "username is taken"
-}
-```
-
 - response sample &rarr; `email` exists
 
 ```json
@@ -341,5 +351,15 @@
   "code": 409,
   "status": "CONFLICT",
   "error": "email is associated with an account, please login or reset password"
+}
+```
+
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
 }
 ```

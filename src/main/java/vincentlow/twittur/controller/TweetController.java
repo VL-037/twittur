@@ -1,6 +1,7 @@
 package vincentlow.twittur.controller;
 
 import static vincentlow.twittur.utils.ObjectMappingHelper.toResponse;
+import static vincentlow.twittur.utils.ValidatorUtil.validatePageableRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class TweetController extends BaseController {
   public ApiListResponse<TweetResponse> getAccountTweets(@PathVariable String username,
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "5") int pageSize) {
+
+    validatePageableRequest(pageNumber, pageSize);
 
     Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
     List<TweetResponse> response = tweets.stream()
