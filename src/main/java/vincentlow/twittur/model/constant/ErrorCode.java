@@ -15,7 +15,12 @@ public enum ErrorCode {
   USERNAME_MAXIMAL_LENGTH_IS_15("username maximal length is 15"),
   BIO_MAXIMAL_LENGTH_IS_100("bio maximal length is 100"),
   EMAIL_ADDRESS_MUST_NOT_BE_BLANK("email address must not be blank"),
-  EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62("email address maximal length is 62");
+  EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62("email address maximal length is 62"),
+
+  // TWEET
+  TWEET_MUST_NOT_BE_NULL("tweet must not be null"),
+  MESSAGE_MUST_NOT_BE_BLANK("message must not be blank"),
+  MESSAGE_MAXIMAL_LENGTH_IS_250("message maximal length is 250");
 
   private String message;
 

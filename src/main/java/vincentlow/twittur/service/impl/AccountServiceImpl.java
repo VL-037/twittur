@@ -27,14 +27,15 @@ import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.CreateAccountRequest;
-import vincentlow.twittur.model.response.exception.InternalServerErrorException;
+import vincentlow.twittur.model.response.exception.ConflictException;
+import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-  
+
   private final String DUMMY_REQUESTS_PATH = "dummy_requests/accounts.json";
 
   @Autowired
@@ -43,14 +44,25 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Page<Account> findAccounts(int pageNumber, int pageSize) {
 
-    return accountRepository.findAll(PageRequest.of(pageNumber, pageSize));
+    try {
+      return accountRepository.findAll(PageRequest.of(pageNumber, pageSize));
+    } catch (Exception e) {
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    }
   }
 
   @Override
   public Account findAccountByUsername(String username) {
 
-    Account account = accountRepository.findByUsername(username);
+    Account account;
+
+    try {
+      account = accountRepository.findByUsername(username);
+    } catch (Exception e) {
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    }
     return validateAccount(account);
+
   }
 
   @Override
@@ -62,27 +74,53 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(StringUtils.isNotBlank(account.getFirstName()),
         ErrorCode.FIRST_NAME_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(account.getFirstName()
-        .length() < 50, ErrorCode.FIRST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
+        .length() <= 50, ErrorCode.FIRST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
     validateArgument(StringUtils.isNotBlank(account.getLastName()), ErrorCode.LAST_NAME_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(account.getLastName()
-        .length() < 50, ErrorCode.LAST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
+        .length() <= 50, ErrorCode.LAST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
     validateState(Objects.nonNull(account.getDateOfBirth()), ErrorCode.DATE_OF_BIRTH_MUST_NOT_BE_NULL.getMessage());
     validateArgument(getCurrentAge(account.getDateOfBirth()) >= 13, ErrorCode.AGE_MUST_BE_AT_LEAST_13.getMessage());
     validateArgument(StringUtils.isNotBlank(account.getUsername()), ErrorCode.USERNAME_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(account.getUsername()
-        .length() > 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
+        .length() >= 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
     validateArgument(account.getUsername()
-        .length() < 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
+        .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
+
+    Account existingAccount;
+    try {
+      existingAccount = accountRepository.findByUsername(account.getUsername());
+    } catch (Exception e) {
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    }
+
+    if (Objects.nonNull(existingAccount)) {
+      throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
+    }
+
     validateArgument(validateBioLength(account.getBio()), ErrorCode.BIO_MAXIMAL_LENGTH_IS_100.getMessage());
     validateArgument(StringUtils.isNotBlank(account.getEmailAddress()),
         ErrorCode.EMAIL_ADDRESS_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(account.getEmailAddress()
-        .length() < 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
+        .length() <= 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
+
+    try {
+      existingAccount = accountRepository.findByEmailAddress(account.getEmailAddress());
+    } catch (Exception e) {
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    }
+
+    if (Objects.nonNull(existingAccount)) {
+      throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
+    }
 
     StringUtil.trimStrings(account);
     account.setTweets(Collections.EMPTY_LIST);
 
-    return accountRepository.save(account);
+    try {
+      return accountRepository.save(account);
+    } catch (Exception e) {
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    }
   }
 
   @Override
@@ -98,7 +136,7 @@ public class AccountServiceImpl implements AccountService {
           .collect(Collectors.toList());
       accountRepository.saveAll(accounts);
     } catch (IOException e) {
-      throw new InternalServerErrorException(ExceptionMessage.FAILED_TO_READ_JSON_FILE);
+      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
     }
   }
 

@@ -106,6 +106,16 @@
 }
 ```
 
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
+}
+```
+
 ## <a name="get-account-tweet-by-id"></a> Get Account Tweet by ID
 
 **Http Method**: `GET`
@@ -156,6 +166,16 @@
 }
 ```
 
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
+}
+```
+
 ## <a name="post-tweet"></a> Post Tweet
 
 **Http Method**: `POST`
@@ -199,6 +219,16 @@
   "code": 404,
   "status": "NOT_FOUND",
   "error": "account not found"
+}
+```
+
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
 }
 ```
 

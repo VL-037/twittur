@@ -2,15 +2,13 @@ package vincentlow.twittur.utils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Objects;
+
+import vincentlow.twittur.model.constant.ExceptionMessage;
+import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 
 public class StringUtil {
 
   public static void trimStrings(Object object) {
-
-    if (Objects.isNull(object)) {
-      return;
-    }
 
     Class<?> clazz = object.getClass();
     Field[] fields = clazz.getDeclaredFields();
@@ -27,7 +25,7 @@ public class StringUtil {
               field.set(object, trimmedFieldValue);
             }
           } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
           }
         });
   }

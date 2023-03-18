@@ -2,8 +2,6 @@ package vincentlow.twittur.utils;
 
 import java.util.Objects;
 
-import com.google.common.base.Preconditions;
-
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.response.exception.BadRequestException;
@@ -13,12 +11,16 @@ public class ValidatorUtil {
 
   public static void validateArgument(boolean expression, String errorMessage) {
 
-    Preconditions.checkArgument(expression, errorMessage);
+    if (!expression) {
+      throw new BadRequestException(errorMessage);
+    }
   }
 
   public static void validateState(boolean expression, String errorMessage) {
 
-    Preconditions.checkState(expression, errorMessage);
+    if (!expression) {
+      throw new BadRequestException(errorMessage);
+    }
   }
 
   public static void validatePageableRequest(int pageNumber, int pageSize) {

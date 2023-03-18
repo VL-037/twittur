@@ -6,9 +6,11 @@ public interface ExceptionMessage {
 
   String PAGE_SIZE_MUST_BE_BETWEEN_1_AND_100 = "page size must be between 1 and 100";
 
-  String FAILED_TO_READ_JSON_FILE = "failed to read json file";
+  String SERVICE_TEMPORARILY_UNAVAILABLE = "service temporarily unavailable";
 
   String ACCOUNT_NOT_FOUND = "account not found";
+  String USERNAME_IS_TAKEN = "username is taken";
+  String EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT = "email is associated with an account, please login or reset password";
 
   String TWEET_NOT_FOUND = "tweet not found";
 }
