@@ -1,7 +1,6 @@
 package vincentlow.twittur.model.request;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,15 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateAccountRequest implements Serializable {
+public class UpdateAccountRequest implements Serializable {
 
   private static final long serialVersionUID = 1742974303828086822L;
-
-  private String firstName;
-
-  private String lastName;
-
-  private Date dateOfBirth;
 
   private String username;
 
@@ -32,7 +25,9 @@ public class CreateAccountRequest implements Serializable {
 
   private String phoneNumber;
 
-  private String password;
+  private String oldPassword;
 
-  private String confirmPassword;
+  private String newPassword;
+
+  private String confirmNewPassword;
 }

@@ -12,22 +12,21 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import vincentlow.twittur.model.entity.Account;
-import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.AccountResponse;
-import vincentlow.twittur.model.response.TweetResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.AccountService;
-import vincentlow.twittur.service.TweetService;
 
 @RestController
 @RequestMapping(value = "/api/v1/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,8 +35,18 @@ public class AccountController extends BaseController {
   @Autowired
   private AccountService accountService;
 
-  @Autowired
-  private TweetService tweetService;
+  @PostMapping
+  public ApiSingleResponse<AccountResponse> createAccount(
+      @RequestBody CreateAccountRequest request) {
+
+    try {
+      Account account = accountService.createAccount(request);
+      AccountResponse response = toResponse(account, AccountResponse.class);
+      return toSuccessApiResponse(response);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
 
   @GetMapping
   public ApiListResponse<AccountResponse> getAccounts(
@@ -60,23 +69,12 @@ public class AccountController extends BaseController {
   }
 
   @GetMapping("/@{username}")
-  public ApiSingleResponse<AccountResponse> getAccountByUsername(@PathVariable("username") String username,
-      @RequestParam(defaultValue = "0") int pageNumber,
-      @RequestParam(defaultValue = "10") int pageSize) {
+  public ApiSingleResponse<AccountResponse> getAccountByUsername(@PathVariable("username") String username) {
 
     try {
-      validatePageableRequest(pageNumber, pageSize);
-
       Account account = accountService.findAccountByUsername(username);
-      Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
 
       AccountResponse response = toResponse(account, AccountResponse.class);
-
-      List<TweetResponse> tweetResponses = tweets.getContent()
-          .stream()
-          .map(tweet -> toResponse(tweet, TweetResponse.class))
-          .collect(Collectors.toList());
-      response.setTweets(tweetResponses);
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
@@ -84,15 +82,17 @@ public class AccountController extends BaseController {
     }
   }
 
-  @PostMapping
-  public ApiSingleResponse<AccountResponse> createAccount(
-      @RequestBody CreateAccountRequest request) {
+  @PutMapping("/@{username}")
+  public ApiSingleResponse<AccountResponse> updateAccount(@PathVariable("username") String username,
+      @RequestBody UpdateAccountRequest request) {
 
     try {
-      Account account = accountService.createAccount(request);
+      Account account = accountService.updateAccountByUsername(username, request);
+
       AccountResponse response = toResponse(account, AccountResponse.class);
+
       return toSuccessApiResponse(response);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

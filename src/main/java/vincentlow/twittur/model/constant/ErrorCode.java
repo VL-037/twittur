@@ -2,8 +2,9 @@ package vincentlow.twittur.model.constant;
 
 public enum ErrorCode {
 
+  REQUEST_MUST_NOT_BE_NULL("request must not be null"),
+
   // ACCOUNT
-  ACCOUNT_MUST_NOT_BE_NULL("account must not be null"),
   FIRST_NAME_MUST_NOT_BE_BLANK("first name must not be blank"),
   FIRST_NAME_MAXIMAL_LENGTH_IS_50("first name maximal length is 50"),
   LAST_NAME_MUST_NOT_BE_BLANK("last name must not be blank"),
@@ -16,6 +17,14 @@ public enum ErrorCode {
   BIO_MAXIMAL_LENGTH_IS_100("bio maximal length is 100"),
   EMAIL_ADDRESS_MUST_NOT_BE_BLANK("email address must not be blank"),
   EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62("email address maximal length is 62"),
+  PHONE_NUMBER_IS_NOT_VALID("phone number is not valid"),
+  PASSWORD_MUST_NOT_BE_BLANK("password must not be blank"),
+  OLD_PASSWORD_MUST_NOT_BE_BLANK("old password must not be blank"),
+  OLD_PASSWORD_IS_WRONG("old password is wrong"),
+  NEW_PASSWORD_MUST_NOT_BE_BLANK("new password must not be blank"),
+  PASSWORD_MINIMAL_LENGTH_IS_10("password minimal length is 10"),
+  CONFIRM_PASSWORD_MUST_NOT_BE_BLANK("confirm password must not be blank"),
+  CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD("confirm password is different with password"),
 
   // TWEET
   TWEET_MUST_NOT_BE_NULL("tweet must not be null"),

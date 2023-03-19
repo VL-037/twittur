@@ -40,7 +40,6 @@
       "username": "johndoe",
       "accountName": "johndoe123",
       "bio": "I'm a software engineer",
-      "tweets": [],
       "tweetsCount": 0
     },
     {
@@ -52,7 +51,6 @@
       "username": "janesmith",
       "accountName": "janesmith123",
       "bio": "I'm a graphic designer",
-      "tweets": [],
       "tweetsCount": 0
     },
     {
@@ -64,7 +62,6 @@
       "username": "michaelbrown",
       "accountName": "michaelbrown123",
       "bio": "I'm a sales manager",
-      "tweets": [],
       "tweetsCount": 0
     },
     {
@@ -76,7 +73,6 @@
       "username": "sarahjohnson",
       "accountName": "sarahjohnson123",
       "bio": "I'm a journalist",
-      "tweets": [],
       "tweetsCount": 0
     },
     {
@@ -88,7 +84,6 @@
       "username": "davidlee",
       "accountName": "davidlee123",
       "bio": "I'm a photographer",
-      "tweets": [],
       "tweetsCount": 0
     }
   ],
@@ -159,110 +154,6 @@
     "username": "johndoe",
     "accountName": "johndoe123",
     "bio": "I'm a software engineer",
-    "tweets": [
-      {
-        "id": "56ccba0c-4294-41f1-9891-c6706f3e977e",
-        "createdDate": "2023-03-18T07:53:18.133+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:18.133+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "The sun is shining and the birds are singing. What a beautiful day!"
-      },
-      {
-        "id": "a522132c-672d-45fc-a522-93036dae3ba8",
-        "createdDate": "2023-03-18T07:53:18.134+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:18.134+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I just finished a great book and I'm already looking for my next read."
-      },
-      {
-        "id": "cd975445-ca88-44a8-8876-538c00d43c92",
-        "createdDate": "2023-03-18T07:53:18.134+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:18.134+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I'm so grateful for my friends and family. They always know how to make me smile."
-      },
-      {
-        "id": "e759dc69-6ac3-4210-afde-8a14b28e8f13",
-        "createdDate": "2023-03-18T07:53:18.139+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:18.139+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "Sometimes the best thing to do is just take a deep breath and let it go."
-      },
-      {
-        "id": "70d64519-243a-480d-87d3-53500febe28d",
-        "createdDate": "2023-03-18T07:53:18.139+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:18.139+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I can't believe how fast time flies. It feels like just yesterday I was starting this job."
-      },
-      {
-        "id": "adfc6ae5-68ef-46ad-88af-cc23efb6e8cd",
-        "createdDate": "2023-03-18T07:53:19.833+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:19.833+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "The sun is shining and the birds are singing. What a beautiful day!"
-      },
-      {
-        "id": "df4d8793-eb84-4d57-90d3-201f26627503",
-        "createdDate": "2023-03-18T07:53:19.833+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:19.833+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I just finished a great book and I'm already looking for my next read."
-      },
-      {
-        "id": "aead54db-e709-413e-bac1-0ecd997c1009",
-        "createdDate": "2023-03-18T07:53:19.833+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:19.833+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I'm so grateful for my friends and family. They always know how to make me smile."
-      },
-      {
-        "id": "1f11dc08-0539-4e68-98b5-6df67834ca44",
-        "createdDate": "2023-03-18T07:53:19.833+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:19.833+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "Sometimes the best thing to do is just take a deep breath and let it go."
-      },
-      {
-        "id": "7acceb1a-59cc-44ff-b11f-42adc318fd73",
-        "createdDate": "2023-03-18T07:53:19.833+00:00",
-        "createdBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "updatedDate": "2023-03-18T07:53:19.833+00:00",
-        "updatedBy": "02815707-bb89-49e6-ba15-dad91f047312",
-        "message": "I can't believe how fast time flies. It feels like just yesterday I was starting this job."
-      }
-    ],
-    "tweetsCount": 15
-  }
-}
-```
-
-- response sample &rarr; empty `tweets`
-
-```json
-{
-  "code": 200,
-  "status": "OK",
-  "error": null,
-  "data": {
-    "id": "02815707-bb89-49e6-ba15-dad91f047312",
-    "createdDate": "2023-03-18T07:52:55.584+00:00",
-    "createdBy": "system",
-    "updatedDate": "2023-03-18T07:52:55.584+00:00",
-    "updatedBy": "system",
-    "username": "johndoe",
-    "accountName": "johndoe123",
-    "bio": "I'm a software engineer",
-    "tweets": [],
     "tweetsCount": 15
   }
 }
@@ -328,7 +219,6 @@
     "username": "johndoe",
     "accountName": "johndoe123",
     "bio": "I'm a software engineer",
-    "tweets": [],
     "tweetsCount": 0
   }
 }

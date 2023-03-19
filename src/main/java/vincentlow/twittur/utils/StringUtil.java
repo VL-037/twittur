@@ -2,6 +2,7 @@ package vincentlow.twittur.utils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
 
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
@@ -20,7 +21,7 @@ public class StringUtil {
             field.setAccessible(true);
             String fieldValue = (String) field.get(object);
 
-            if (fieldValue != null) {
+            if (Objects.nonNull(fieldValue)) {
               String trimmedFieldValue = fieldValue.trim();
               field.set(object, trimmedFieldValue);
             }

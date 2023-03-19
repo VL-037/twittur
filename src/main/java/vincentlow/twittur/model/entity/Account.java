@@ -9,7 +9,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -40,14 +39,17 @@ public class Account extends BaseEntity {
   @Column(name = "email_address")
   private String emailAddress;
 
+  @Column(name = "phone_number")
+  private String phoneNumber;
+
+  @Column(name = "salt")
+  private String salt;
+
+  @Column(name = "password")
+  private String password;
+
   @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
   private List<Tweet> tweets;
 
   private int tweetsCount;
-
-  @PrePersist
-  public void prePersist() {
-
-    super.prePersist();
-  }
 }

@@ -5,6 +5,7 @@ import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -76,9 +77,12 @@ public class TweetServiceImpl implements TweetService {
     Account account = accountService.findAccountByUsername(username);
     validateAccount(account);
 
+    Date now = new Date();
     tweet.setCreator(account);
     tweet.setCreatedBy(account.getId());
+    tweet.setCreatedDate(now);
     tweet.setUpdatedBy(account.getId());
+    tweet.setUpdatedDate(now);
 
     account.setTweetsCount(account.getTweetsCount() + 1);
     accountRepository.save(account);
@@ -118,7 +122,6 @@ public class TweetServiceImpl implements TweetService {
   private Tweet convertToTweet(CreateTweetRequest request) {
 
     Tweet tweet = new Tweet();
-    tweet.prePersist();
     tweet.setMessage(request.getMessage());
     return tweet;
   }

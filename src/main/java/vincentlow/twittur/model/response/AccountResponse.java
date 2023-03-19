@@ -1,8 +1,5 @@
 package vincentlow.twittur.model.response;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
@@ -18,8 +15,6 @@ public class AccountResponse extends BaseResponse {
   private String accountName;
 
   private String bio;
-
-  private List<TweetResponse> tweets = new ArrayList<>();
 
   private int tweetsCount;
 }

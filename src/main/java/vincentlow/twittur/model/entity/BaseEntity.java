@@ -23,27 +23,19 @@ public class BaseEntity implements Serializable {
   protected String id;
 
   @Column(name = "created_by")
-  protected String createdBy = "system";
+  protected String createdBy;
 
   @Column(name = "created_date")
   protected Date createdDate;
 
   @Column(name = "updated_by")
-  protected String updatedBy = "system";
+  protected String updatedBy;
 
   @Column(name = "updated_date")
   protected Date updatedDate;
 
   @Column(name = "mark_for_delete")
   protected boolean markForDelete;
-
-  @PrePersist
-  protected void prePersist() {
-
-    Date now = new Date();
-    createdDate = now;
-    updatedDate = now;
-  }
 
   @Override
   public String toString() {

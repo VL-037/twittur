@@ -20,10 +20,4 @@ public class Tweet extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "creator_id", referencedColumnName = "id")
   private Account creator;
-
-  @PrePersist
-  public void prePersist() {
-
-    super.prePersist();
-  }
 }
