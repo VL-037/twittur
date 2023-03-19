@@ -11,6 +11,7 @@ import vincentlow.twittur.model.response.api.ApiResponse;
 import vincentlow.twittur.model.response.exception.BadRequestException;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.NotFoundException;
+import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 
 @ControllerAdvice
 @RestController
@@ -34,8 +35,8 @@ public class ExceptionController extends BaseController {
     return toErrorApiResponse(HttpStatus.CONFLICT, ex.getMessage());
   }
 
-  @ExceptionHandler(value = {DataAccessException.class})
-  public ApiResponse handleDataAccessException() {
+  @ExceptionHandler(value = {DataAccessException.class, ServiceUnavailableException.class})
+  public ApiResponse handleServiceUnavailableException() {
 
     return toErrorApiResponse(HttpStatus.SERVICE_UNAVAILABLE, ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
   }

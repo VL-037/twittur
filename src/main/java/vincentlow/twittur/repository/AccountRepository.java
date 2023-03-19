@@ -12,6 +12,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
   Page<Account> findAll(Pageable pageable);
 
+  Account findByIdAndMarkForDeleteFalse(String id);
+
   Account findByUsername(String username);
+
   Account findByEmailAddress(String emailAddress);
 }

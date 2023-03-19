@@ -5,11 +5,12 @@ import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -50,14 +51,16 @@ public class TweetServiceImpl implements TweetService {
   public Page<Tweet> findAccountTweets(String username, int pageNumber, int pageSize) {
 
     Account account = accountService.findAccountByUsername(username);
-    return tweetRepository.findAllByCreatorId(validateAccount(account).getId(), PageRequest.of(pageNumber, pageSize));
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    return tweetRepository.findAllByCreatorId(account.getId(), PageRequest.of(pageNumber, pageSize));
   }
 
   @Override
   public Tweet findAccountTweetById(String username, String tweetId) {
 
     Account account = accountService.findAccountByUsername(username);
-    validateAccount(account);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     return tweetRepository.findById(tweetId)
         .orElseThrow(() -> new NotFoundException(ExceptionMessage.TWEET_NOT_FOUND));
@@ -66,18 +69,19 @@ public class TweetServiceImpl implements TweetService {
   @Override
   public Tweet createTweet(String username, CreateTweetRequest request) {
 
-    Tweet tweet = convertToTweet(request);
-
-    validateState(Objects.nonNull(tweet), ErrorCode.TWEET_MUST_NOT_BE_NULL.getMessage());
-    validateArgument(StringUtils.isNotBlank(tweet.getMessage()),
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getMessage()),
         ErrorCode.MESSAGE_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(tweet.getMessage()
+    validateArgument(request.getMessage()
         .length() <= 250, ErrorCode.MESSAGE_MAXIMAL_LENGTH_IS_250.getMessage());
 
     Account account = accountService.findAccountByUsername(username);
-    validateAccount(account);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
-    Date now = new Date();
+    Tweet tweet = new Tweet();
+    BeanUtils.copyProperties(request, tweet);
+
+    LocalDateTime now = LocalDateTime.now();
     tweet.setCreator(account);
     tweet.setCreatedBy(account.getId());
     tweet.setCreatedDate(now);
@@ -97,7 +101,7 @@ public class TweetServiceImpl implements TweetService {
     ClassPathResource requestJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
     Account account = accountService.findAccountByUsername(username);
-    validateAccount(account);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     try {
       List<CreateTweetRequest> requests = mapper.readValue(requestJson.getInputStream(), new TypeReference<>() {});
@@ -105,10 +109,13 @@ public class TweetServiceImpl implements TweetService {
           .map(request -> convertToTweet(request))
           .collect(Collectors.toList());
 
+      LocalDateTime now = LocalDateTime.now();
       tweets.forEach(tweet -> {
         tweet.setCreator(account);
         tweet.setCreatedBy(account.getId());
+        tweet.setCreatedDate(now);
         tweet.setUpdatedBy(account.getId());
+        tweet.setUpdatedDate(now);
       });
 
       List<Tweet> saved = tweetRepository.saveAll(tweets);

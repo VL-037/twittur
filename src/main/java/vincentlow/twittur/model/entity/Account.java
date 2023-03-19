@@ -1,9 +1,7 @@
 package vincentlow.twittur.model.entity;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +13,7 @@ import lombok.Data;
 @Entity
 @Table(name = "account")
 @Data
-@JsonIgnoreProperties(value = {"tweets"})
+// @JsonIgnoreProperties(value = {"tweets", "followers", "following"})
 public class Account extends BaseEntity {
 
   @Column(name = "first_name")
@@ -25,7 +23,7 @@ public class Account extends BaseEntity {
   private String lastName;
 
   @Column(name = "date_of_birth")
-  private Date dateOfBirth;
+  private LocalDate dateOfBirth;
 
   @Column(name = "username")
   private String username;
@@ -51,5 +49,18 @@ public class Account extends BaseEntity {
   @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
   private List<Tweet> tweets;
 
+  @OneToMany(mappedBy = "followed")
+  private List<AccountRelationship> followers;
+
+  @OneToMany(mappedBy = "follower")
+  private List<AccountRelationship> following;
+
+  @Column(name = "tweets_count")
   private int tweetsCount;
+
+  @Column(name = "followers_count")
+  private int followersCount;
+
+  @Column(name = "following_count")
+  private int followingCount;
 }

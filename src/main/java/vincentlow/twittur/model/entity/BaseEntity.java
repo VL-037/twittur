@@ -1,7 +1,7 @@
 package vincentlow.twittur.model.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -9,7 +9,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
 import lombok.Data;
 
 @Data
@@ -26,13 +25,13 @@ public class BaseEntity implements Serializable {
   protected String createdBy;
 
   @Column(name = "created_date")
-  protected Date createdDate;
+  protected LocalDateTime createdDate;
 
   @Column(name = "updated_by")
   protected String updatedBy;
 
   @Column(name = "updated_date")
-  protected Date updatedDate;
+  protected LocalDateTime updatedDate;
 
   @Column(name = "mark_for_delete")
   protected boolean markForDelete;

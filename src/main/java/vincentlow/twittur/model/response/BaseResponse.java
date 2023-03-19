@@ -1,6 +1,7 @@
 package vincentlow.twittur.model.response;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -16,11 +17,11 @@ public class BaseResponse implements Serializable {
 
   private String id;
 
-  private Date createdDate;
+  private LocalDateTime createdDate;
 
   private String createdBy;
 
-  private Date updatedDate;
+  private LocalDateTime updatedDate;
 
   private String updatedBy;
 }

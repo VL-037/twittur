@@ -5,8 +5,10 @@ import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -22,16 +24,19 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.micrometer.common.util.StringUtils;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
+import vincentlow.twittur.model.entity.AccountRelationship;
+import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
-import vincentlow.twittur.model.response.exception.BadRequestException;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
+import vincentlow.twittur.repository.AccountRelationshipRepository;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
@@ -43,6 +48,9 @@ public class AccountServiceImpl implements AccountService {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private AccountRelationshipRepository accountRelationshipRepository;
 
   @Override
   public Account createAccount(CreateAccountRequest request) {
@@ -60,15 +68,19 @@ public class AccountServiceImpl implements AccountService {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
 
+    Account account = new Account();
+    BeanUtils.copyProperties(request, account);
+
     String salt = BCrypt.gensalt();
     String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
 
-    Account account = convertToAccount(request);
     account.setSalt(salt);
     account.setPassword(hashedPassword);
     account.setTweets(Collections.EMPTY_LIST);
+    account.setFollowers(Collections.EMPTY_LIST);
+    account.setFollowing(Collections.EMPTY_LIST);
 
-    Date now = new Date();
+    LocalDateTime now = LocalDateTime.now();
     account.setCreatedBy("system");
     account.setCreatedDate(now);
     account.setUpdatedBy("system");
@@ -87,14 +99,14 @@ public class AccountServiceImpl implements AccountService {
   public Account findAccountByUsername(String username) {
 
     Account account = accountRepository.findByUsername(username);;
-    return validateAccount(account);
+    return validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
   @Override
   public Account updateAccountByUsername(String username, UpdateAccountRequest request) {
 
     Account account = accountRepository.findByUsername(username);
-    validateAccount(account);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
     validateRequest(request);
@@ -128,7 +140,7 @@ public class AccountServiceImpl implements AccountService {
     account.setSalt(newSalt);
     account.setPassword(newHashedPassword);
     account.setUpdatedBy(account.getId());
-    account.setUpdatedDate(new Date());
+    account.setUpdatedDate(LocalDateTime.now());
 
     return accountRepository.save(account);
   }
@@ -137,11 +149,11 @@ public class AccountServiceImpl implements AccountService {
   public void initDummyAccounts() {
 
     ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule()); // map birthDate to LocalDate
     ClassPathResource accountJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
     try {
-      List<CreateAccountRequest> requests =
-          mapper.readValue(accountJson.getInputStream(), new TypeReference<>() {});
+      List<CreateAccountRequest> requests = mapper.readValue(accountJson.getInputStream(), new TypeReference<>() {});
       List<Account> accounts = requests.stream()
           .map(request -> convertToAccount(request))
           .collect(Collectors.toList());
@@ -151,19 +163,64 @@ public class AccountServiceImpl implements AccountService {
     }
   }
 
-  private Account convertToAccount(CreateAccountRequest request) {
+  @Override
+  public void follow(AccountRelationshipRequest request) {
 
-    Account account = new Account();
-    account.setFirstName(request.getFirstName());
-    account.setLastName(request.getLastName());
-    account.setDateOfBirth(request.getDateOfBirth());
-    account.setUsername(request.getUsername());
-    account.setAccountName(request.getAccountName());
-    account.setBio(request.getBio());
-    account.setEmailAddress(request.getEmailAddress());
-    account.setPhoneNumber(request.getPhoneNumber());
-    account.setPassword(request.getPassword());
-    return account;
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getFollowedId()),
+        ErrorCode.FOLLOWED_ID_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getFollowerId()),
+        ErrorCode.FOLLOWER_ID_MUST_NOT_BE_BLANK.getMessage());
+
+    Account followerAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowerId());
+    validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
+
+    Account followedAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowedId());
+    validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
+
+    AccountRelationship relationship = new AccountRelationship();
+    relationship.setFollower(followerAccount);
+    relationship.setFollowed(followedAccount);
+
+    LocalDateTime now = LocalDateTime.now();
+    relationship.setCreatedBy(followerAccount.getId());
+    relationship.setCreatedDate(now);
+    relationship.setUpdatedBy(followerAccount.getId());
+    relationship.setUpdatedDate(now);
+
+    followerAccount.setFollowingCount(followerAccount.getFollowingCount() + 1);
+    followedAccount.setFollowersCount(followedAccount.getFollowersCount() + 1);
+
+    accountRelationshipRepository.save(relationship);
+    accountRepository.saveAll(List.of(followerAccount, followedAccount));
+  }
+
+  @Override
+  public void unfollow(AccountRelationshipRequest request) {
+
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getFollowedId()),
+        ErrorCode.FOLLOWED_ID_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getFollowerId()),
+        ErrorCode.FOLLOWER_ID_MUST_NOT_BE_BLANK.getMessage());
+
+    AccountRelationship relationship =
+        accountRelationshipRepository.findByFollowerIdAndFollowedId(request.getFollowerId(), request.getFollowedId());
+
+    if (Objects.nonNull(relationship)) {
+      accountRelationshipRepository.delete(relationship);
+
+      Account followerAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowerId());
+      validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
+
+      Account followedAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowedId());
+      validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
+
+      followerAccount.setFollowingCount(followerAccount.getFollowingCount() - 1);
+      followedAccount.setFollowersCount(followedAccount.getFollowersCount() - 1);
+
+      accountRepository.saveAll(List.of(followerAccount, followedAccount));
+    }
   }
 
   private void validateRequest(CreateAccountRequest request) {
@@ -177,7 +234,7 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(request.getLastName()
         .length() <= 50, ErrorCode.LAST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
     validateState(Objects.nonNull(request.getDateOfBirth()), ErrorCode.DATE_OF_BIRTH_MUST_NOT_BE_NULL.getMessage());
-    // validateArgument(getCurrentAge(request.getDateOfBirth()) >= 13, ErrorCode.AGE_MUST_BE_AT_LEAST_13.getMessage());
+    validateArgument(getCurrentAge(request.getDateOfBirth()) >= 13, ErrorCode.AGE_MUST_BE_AT_LEAST_13.getMessage());
     validateArgument(StringUtils.isNotBlank(request.getUsername()), ErrorCode.USERNAME_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(request.getUsername()
         .length() >= 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
@@ -244,13 +301,12 @@ public class AccountServiceImpl implements AccountService {
         .matches();
   }
 
-  // private int getCurrentAge(Date dateOfBirth) {
-  //
-  // LocalDate currentDate = LocalDate.now();
-  // LocalDate birthDate = dateOfBirth.toLocalDate();
-  // return Period.between(birthDate, currentDate)
-  // .getYears();
-  // }
+  private int getCurrentAge(LocalDate dateOfBirth) {
+
+    LocalDate currentDate = LocalDate.now();
+    return Period.between(dateOfBirth, currentDate)
+        .getYears();
+  }
 
   private boolean validateBioLength(String bio) {
 
@@ -258,5 +314,28 @@ public class AccountServiceImpl implements AccountService {
       return true;
     }
     return bio.length() < 100;
+  }
+
+  private Account convertToAccount(CreateAccountRequest request) {
+
+    Account account = new Account();
+    BeanUtils.copyProperties(request, account);
+
+    String salt = BCrypt.gensalt();
+    String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
+
+    account.setSalt(salt);
+    account.setPassword(hashedPassword);
+    account.setTweets(Collections.EMPTY_LIST);
+    account.setFollowers(Collections.EMPTY_LIST);
+    account.setFollowing(Collections.EMPTY_LIST);
+
+    LocalDateTime now = LocalDateTime.now();
+    account.setCreatedBy("system");
+    account.setCreatedDate(now);
+    account.setUpdatedBy("system");
+    account.setUpdatedDate(now);
+
+    return account;
   }
 }

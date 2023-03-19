@@ -17,4 +17,8 @@ public class AccountResponse extends BaseResponse {
   private String bio;
 
   private int tweetsCount;
+
+  private int followersCount;
+
+  private int followingCount;
 }

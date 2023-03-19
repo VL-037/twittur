@@ -11,6 +11,8 @@ CREATE TABLE account (
     salt VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     tweets_count INTEGER NOT NULL,
+    followers_count INTEGER NOT NULL,
+    following_count INTEGER NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     created_date TIMESTAMP NOT NULL,
     updated_by VARCHAR(255) NOT NULL,

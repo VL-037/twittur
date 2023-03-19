@@ -1,7 +1,7 @@
 package vincentlow.twittur.model.request;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +20,7 @@ public class CreateAccountRequest implements Serializable {
 
   private String lastName;
 
-  private Date dateOfBirth;
+  private LocalDate dateOfBirth;
 
   private String username;
 

@@ -32,10 +32,10 @@ public class ValidatorUtil {
     }
   }
 
-  public static Account validateAccount(Account account) {
+  public static Account validateAccount(Account account, String errorMessage) {
 
     if (Objects.isNull(account)) {
-      throw new NotFoundException(ExceptionMessage.ACCOUNT_NOT_FOUND);
+      throw new NotFoundException(errorMessage);
     }
     return account;
   }

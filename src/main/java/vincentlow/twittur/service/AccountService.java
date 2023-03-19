@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 
 public interface AccountService {
@@ -17,4 +18,8 @@ public interface AccountService {
   Account updateAccountByUsername(String username, UpdateAccountRequest request);
 
   void initDummyAccounts();
+
+  void follow(AccountRelationshipRequest request);
+
+  void unfollow(AccountRelationshipRequest request);
 }

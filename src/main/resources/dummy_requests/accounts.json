@@ -2,46 +2,61 @@
   {
     "firstName": "John",
     "lastName": "Doe",
-    "dateOfBirth": "1990-01-01",
-    "username": "johndoe",
-    "accountName": "johndoe123",
-    "bio": "I'm a software engineer",
-    "emailAddress": "john.doe@example.com"
+    "dateOfBirth": "1995-05-23",
+    "username": "johndoe123",
+    "accountName": "John's Account",
+    "bio": "I'm a web developer",
+    "emailAddress": "johndoe123@gmail.com",
+    "phoneNumber": "+15417543010",
+    "password": "123456123456",
+    "confirmPassword": "123456123456"
   },
   {
     "firstName": "Jane",
     "lastName": "Smith",
-    "dateOfBirth": "1995-05-05",
-    "username": "janesmith",
-    "accountName": "janesmith123",
+    "dateOfBirth": "1990-08-15",
+    "username": "janesmith456",
+    "accountName": "Jane's Account",
     "bio": "I'm a graphic designer",
-    "emailAddress": "jane.smith@example.com"
+    "emailAddress": "janesmith456@gmail.com",
+    "phoneNumber": "+14158123990",
+    "password": "password123",
+    "confirmPassword": "password123"
+  },
+  {
+    "firstName": "Robert",
+    "lastName": "Johnson",
+    "dateOfBirth": "1987-02-04",
+    "username": "robertjohnson789",
+    "accountName": "Robert's Account",
+    "bio": "I'm a software engineer",
+    "emailAddress": "robertjohnson789@gmail.com",
+    "phoneNumber": "+14045551212",
+    "password": "abcdefgabcdefg",
+    "confirmPassword": "abcdefgabcdefg"
+  },
+  {
+    "firstName": "Emily",
+    "lastName": "Davis",
+    "dateOfBirth": "1998-12-28",
+    "username": "emilydavis321",
+    "accountName": "Emily's Account",
+    "bio": "I'm a photographer",
+    "emailAddress": "emilydavis321@gmail.com",
+    "phoneNumber": "+13035551212",
+    "password": "qwertyuiop",
+    "confirmPassword": "qwertyuiop"
   },
   {
     "firstName": "Michael",
     "lastName": "Brown",
-    "dateOfBirth": "1985-02-15",
-    "username": "michaelbrown",
-    "accountName": "michaelbrown123",
-    "bio": "I'm a sales manager",
-    "emailAddress": "michael.brown@example.com"
-  },
-  {
-    "firstName": "Sarah",
-    "lastName": "Johnson",
-    "dateOfBirth": "1992-11-20",
-    "username": "sarahjohnson",
-    "accountName": "sarahjohnson123",
-    "bio": "I'm a journalist",
-    "emailAddress": "sarah.johnson@example.com"
-  },
-  {
-    "firstName": "David",
-    "lastName": "Lee",
-    "dateOfBirth": "1988-07-10",
-    "username": "davidlee",
-    "accountName": "davidlee123",
-    "bio": "I'm a photographer",
-    "emailAddress": "david.lee@example.com"
+    "dateOfBirth": "1992-06-17",
+    "username": "michaelbrown654",
+    "accountName": "Michael's Account",
+    "bio": "I'm a teacher",
+    "emailAddress": "michaelbrown654@gmail.com",
+    "phoneNumber": "+12024567890",
+    "password": "password1password1",
+    "confirmPassword": "password1password1"
   }
 ]

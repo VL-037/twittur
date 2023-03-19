@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.AccountResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
@@ -42,6 +43,7 @@ public class AccountController extends BaseController {
     try {
       Account account = accountService.createAccount(request);
       AccountResponse response = toResponse(account, AccountResponse.class);
+
       return toSuccessApiResponse(response);
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
@@ -73,7 +75,6 @@ public class AccountController extends BaseController {
 
     try {
       Account account = accountService.findAccountByUsername(username);
-
       AccountResponse response = toResponse(account, AccountResponse.class);
 
       return toSuccessApiResponse(response);
@@ -88,7 +89,6 @@ public class AccountController extends BaseController {
 
     try {
       Account account = accountService.updateAccountByUsername(username, request);
-
       AccountResponse response = toResponse(account, AccountResponse.class);
 
       return toSuccessApiResponse(response);
@@ -102,6 +102,28 @@ public class AccountController extends BaseController {
 
     try {
       accountService.initDummyAccounts();
+      return successResponse;
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PostMapping("/_follow")
+  public ApiResponse followAccount(@RequestBody AccountRelationshipRequest request) {
+
+    try {
+      accountService.follow(request);
+      return successResponse;
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PostMapping("/_unfollow")
+  public ApiResponse unfollowAccount(@RequestBody AccountRelationshipRequest request) {
+
+    try {
+      accountService.unfollow(request);
       return successResponse;
     } catch (RuntimeException e) {
       throw new RuntimeException(e.getMessage(), e);

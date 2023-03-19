@@ -25,6 +25,8 @@ public enum ErrorCode {
   PASSWORD_MINIMAL_LENGTH_IS_10("password minimal length is 10"),
   CONFIRM_PASSWORD_MUST_NOT_BE_BLANK("confirm password must not be blank"),
   CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD("confirm password is different with password"),
+  FOLLOWED_ID_MUST_NOT_BE_BLANK("followed id must not be null"),
+  FOLLOWER_ID_MUST_NOT_BE_BLANK("follower id must not be null"),
 
   // TWEET
   TWEET_MUST_NOT_BE_NULL("tweet must not be null"),
