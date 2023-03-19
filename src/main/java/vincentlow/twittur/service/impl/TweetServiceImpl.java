@@ -48,40 +48,18 @@ public class TweetServiceImpl implements TweetService {
   @Override
   public Page<Tweet> findAccountTweets(String username, int pageNumber, int pageSize) {
 
-    Account account;
-    try {
-      account = accountService.findAccountByUsername(username);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
-    validateAccount(account);
-
-    try {
-      return tweetRepository.findAllByCreatorId(account.getId(), PageRequest.of(pageNumber, pageSize));
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    Account account = accountService.findAccountByUsername(username);
+    return tweetRepository.findAllByCreatorId(validateAccount(account).getId(), PageRequest.of(pageNumber, pageSize));
   }
 
   @Override
   public Tweet findAccountTweetById(String username, String tweetId) {
 
-    Account account;
-    try {
-      account = accountService.findAccountByUsername(username);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
+    Account account = accountService.findAccountByUsername(username);
     validateAccount(account);
 
-    try {
-      return tweetRepository.findById(tweetId)
-          .orElseThrow(() -> new NotFoundException(ExceptionMessage.TWEET_NOT_FOUND));
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    return tweetRepository.findById(tweetId)
+        .orElseThrow(() -> new NotFoundException(ExceptionMessage.TWEET_NOT_FOUND));
   }
 
   @Override
@@ -95,27 +73,17 @@ public class TweetServiceImpl implements TweetService {
     validateArgument(tweet.getMessage()
         .length() <= 250, ErrorCode.MESSAGE_MAXIMAL_LENGTH_IS_250.getMessage());
 
-    Account account;
-    try {
-      account = accountService.findAccountByUsername(username);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
+    Account account = accountService.findAccountByUsername(username);
     validateAccount(account);
 
-    try {
-      tweet.setCreator(account);
-      tweet.setCreatedBy(account.getId());
-      tweet.setUpdatedBy(account.getId());
+    tweet.setCreator(account);
+    tweet.setCreatedBy(account.getId());
+    tweet.setUpdatedBy(account.getId());
 
-      account.setTweetsCount(account.getTweetsCount() + 1);
-      accountRepository.save(account);
+    account.setTweetsCount(account.getTweetsCount() + 1);
+    accountRepository.save(account);
 
-      return tweetRepository.save(tweet);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    return tweetRepository.save(tweet);
   }
 
   @Override
@@ -124,13 +92,7 @@ public class TweetServiceImpl implements TweetService {
     ObjectMapper mapper = new ObjectMapper();
     ClassPathResource requestJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
-    Account account;
-    try {
-      account = accountService.findAccountByUsername(username);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
+    Account account = accountService.findAccountByUsername(username);
     validateAccount(account);
 
     try {

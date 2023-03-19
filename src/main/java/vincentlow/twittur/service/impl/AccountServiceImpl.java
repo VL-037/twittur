@@ -44,25 +44,14 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Page<Account> findAccounts(int pageNumber, int pageSize) {
 
-    try {
-      return accountRepository.findAll(PageRequest.of(pageNumber, pageSize));
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    return accountRepository.findAll(PageRequest.of(pageNumber, pageSize));
   }
 
   @Override
   public Account findAccountByUsername(String username) {
 
-    Account account;
-
-    try {
-      account = accountRepository.findByUsername(username);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    Account account = accountRepository.findByUsername(username);;
     return validateAccount(account);
-
   }
 
   @Override
@@ -86,13 +75,7 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(account.getUsername()
         .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
 
-    Account existingAccount;
-    try {
-      existingAccount = accountRepository.findByUsername(account.getUsername());
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
+    Account existingAccount = accountRepository.findByUsername(account.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
@@ -103,12 +86,7 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(account.getEmailAddress()
         .length() <= 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
 
-    try {
-      existingAccount = accountRepository.findByEmailAddress(account.getEmailAddress());
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
-
+    existingAccount = accountRepository.findByEmailAddress(account.getEmailAddress());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
@@ -116,11 +94,7 @@ public class AccountServiceImpl implements AccountService {
     StringUtil.trimStrings(account);
     account.setTweets(Collections.EMPTY_LIST);
 
-    try {
-      return accountRepository.save(account);
-    } catch (Exception e) {
-      throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
-    }
+    return accountRepository.save(account);
   }
 
   @Override

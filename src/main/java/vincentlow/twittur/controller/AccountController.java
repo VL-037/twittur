@@ -44,15 +44,19 @@ public class AccountController extends BaseController {
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize) {
 
-    validatePageableRequest(pageNumber, pageSize);
+    try {
+      validatePageableRequest(pageNumber, pageSize);
 
-    Page<Account> accounts = accountService.findAccounts(pageNumber, pageSize);
-    List<AccountResponse> response = accounts.stream()
-        .map(account -> toResponse(account, AccountResponse.class))
-        .collect(Collectors.toList());
-    PageMetaData pageMetaData = getPageMetaData(accounts, pageNumber, pageSize);
+      Page<Account> accounts = accountService.findAccounts(pageNumber, pageSize);
+      List<AccountResponse> response = accounts.stream()
+          .map(account -> toResponse(account, AccountResponse.class))
+          .collect(Collectors.toList());
+      PageMetaData pageMetaData = getPageMetaData(accounts, pageNumber, pageSize);
 
-    return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessApiResponse(response, pageMetaData);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @GetMapping("/@{username}")
@@ -60,35 +64,47 @@ public class AccountController extends BaseController {
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize) {
 
-    validatePageableRequest(pageNumber, pageSize);
+    try {
+      validatePageableRequest(pageNumber, pageSize);
 
-    Account account = accountService.findAccountByUsername(username);
-    Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
+      Account account = accountService.findAccountByUsername(username);
+      Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
 
-    AccountResponse response = toResponse(account, AccountResponse.class);
+      AccountResponse response = toResponse(account, AccountResponse.class);
 
-    List<TweetResponse> tweetResponses = tweets.getContent()
-        .stream()
-        .map(tweet -> toResponse(tweet, TweetResponse.class))
-        .collect(Collectors.toList());
-    response.setTweets(tweetResponses);
+      List<TweetResponse> tweetResponses = tweets.getContent()
+          .stream()
+          .map(tweet -> toResponse(tweet, TweetResponse.class))
+          .collect(Collectors.toList());
+      response.setTweets(tweetResponses);
 
-    return toSuccessApiResponse(response);
+      return toSuccessApiResponse(response);
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @PostMapping
   public ApiSingleResponse<AccountResponse> createAccount(
       @RequestBody CreateAccountRequest request) {
 
-    Account account = accountService.createAccount(request);
-    AccountResponse response = toResponse(account, AccountResponse.class);
-    return toSuccessApiResponse(response);
+    try {
+      Account account = accountService.createAccount(request);
+      AccountResponse response = toResponse(account, AccountResponse.class);
+      return toSuccessApiResponse(response);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @PostMapping("/init")
   public ApiResponse initDummyAccounts() {
 
-    accountService.initDummyAccounts();
-    return successResponse;
+    try {
+      accountService.initDummyAccounts();
+      return successResponse;
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 }

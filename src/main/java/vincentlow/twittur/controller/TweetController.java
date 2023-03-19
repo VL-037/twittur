@@ -38,41 +38,57 @@ public class TweetController extends BaseController {
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "5") int pageSize) {
 
-    validatePageableRequest(pageNumber, pageSize);
+    try {
+      validatePageableRequest(pageNumber, pageSize);
 
-    Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
-    List<TweetResponse> response = tweets.stream()
-        .map(tweet -> toResponse(tweet, TweetResponse.class))
-        .collect(Collectors.toList());
-    PageMetaData pageMetaData = getPageMetaData(tweets, pageNumber, pageSize);
+      Page<Tweet> tweets = tweetService.findAccountTweets(username, pageNumber, pageSize);
+      List<TweetResponse> response = tweets.stream()
+          .map(tweet -> toResponse(tweet, TweetResponse.class))
+          .collect(Collectors.toList());
+      PageMetaData pageMetaData = getPageMetaData(tweets, pageNumber, pageSize);
 
-    return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessApiResponse(response, pageMetaData);
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @GetMapping("/{tweetId}")
   public ApiSingleResponse<TweetResponse> getAccountTweetById(@PathVariable String username,
       @PathVariable String tweetId) {
 
-    Tweet tweet = tweetService.findAccountTweetById(username, tweetId);
-    TweetResponse response = toResponse(tweet, TweetResponse.class);
+    try {
+      Tweet tweet = tweetService.findAccountTweetById(username, tweetId);
+      TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-    return toSuccessApiResponse(response);
+      return toSuccessApiResponse(response);
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @PostMapping
   public ApiSingleResponse<TweetResponse> postTweet(@PathVariable String username,
       @RequestBody CreateTweetRequest request) {
 
-    Tweet tweet = tweetService.createTweet(username, request);
-    TweetResponse response = toResponse(tweet, TweetResponse.class);
+    try {
+      Tweet tweet = tweetService.createTweet(username, request);
+      TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-    return toSuccessApiResponse(response);
+      return toSuccessApiResponse(response);
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @PostMapping("/init")
   public ApiResponse initDummyTweets(@PathVariable String username) {
 
-    tweetService.initDummyTweets(username);
-    return successResponse;
+    try {
+      tweetService.initDummyTweets(username);
+      return successResponse;
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 }
