@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
     StringUtil.trimStrings(request);
     validateRequest(request);
 
-    Account existingAccount = accountRepository.findByUsername(request.getUsername());
+    Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
@@ -98,14 +98,14 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Account findAccountByUsername(String username) {
 
-    Account account = accountRepository.findByUsername(username);;
+    Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);;
     return validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
   @Override
   public Account updateAccountByUsername(String username, UpdateAccountRequest request) {
 
-    Account account = accountRepository.findByUsername(username);
+    Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -113,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
 
     if (!request.getUsername()
         .equals(account.getUsername())) {
-      Account existingAccount = accountRepository.findByUsername(account.getUsername());
+      Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(account.getUsername());
       if (Objects.nonNull(existingAccount)) {
         throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
       }
@@ -155,7 +155,7 @@ public class AccountServiceImpl implements AccountService {
     try {
       List<CreateAccountRequest> requests = mapper.readValue(accountJson.getInputStream(), new TypeReference<>() {});
       List<Account> accounts = requests.stream()
-          .map(request -> convertToAccount(request))
+          .map(this::convertToAccount)
           .collect(Collectors.toList());
       accountRepository.saveAll(accounts);
     } catch (IOException e) {
@@ -208,7 +208,7 @@ public class AccountServiceImpl implements AccountService {
         accountRelationshipRepository.findByFollowerIdAndFollowedId(request.getFollowerId(), request.getFollowedId());
 
     if (Objects.nonNull(relationship)) {
-      accountRelationshipRepository.delete(relationship);
+      accountRelationshipRepository.deleteById(relationship.getId());
 
       Account followerAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowerId());
       validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
@@ -317,6 +317,16 @@ public class AccountServiceImpl implements AccountService {
   }
 
   private Account convertToAccount(CreateAccountRequest request) {
+
+    Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+    if (Objects.nonNull(existingAccount)) {
+      throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
+    }
+
+    existingAccount = accountRepository.findByEmailAddress(request.getEmailAddress());
+    if (Objects.nonNull(existingAccount)) {
+      throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
+    }
 
     Account account = new Account();
     BeanUtils.copyProperties(request, account);

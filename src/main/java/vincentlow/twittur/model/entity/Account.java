@@ -13,7 +13,6 @@ import lombok.Data;
 @Entity
 @Table(name = "account")
 @Data
-// @JsonIgnoreProperties(value = {"tweets", "followers", "following"})
 public class Account extends BaseEntity {
 
   @Column(name = "first_name")

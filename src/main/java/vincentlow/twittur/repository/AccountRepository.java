@@ -14,7 +14,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
   Account findByIdAndMarkForDeleteFalse(String id);
 
-  Account findByUsername(String username);
+  Account findByUsernameAndMarkForDeleteFalse(String username);
 
   Account findByEmailAddress(String emailAddress);
 }

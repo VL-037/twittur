@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
+import vincentlow.twittur.model.request.UpdateTweetRequest;
 
 public interface TweetService {
 
@@ -14,4 +15,8 @@ public interface TweetService {
   Tweet createTweet(String username, CreateTweetRequest request);
 
   void initDummyTweets(String username);
+
+  Tweet updateAccountTweet(String username, String tweetId, UpdateTweetRequest request);
+
+  void deleteAccountTweet(String username, String tweetId);
 }

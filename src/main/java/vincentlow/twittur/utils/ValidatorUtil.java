@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
+import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.response.exception.BadRequestException;
 import vincentlow.twittur.model.response.exception.NotFoundException;
 
@@ -38,5 +39,13 @@ public class ValidatorUtil {
       throw new NotFoundException(errorMessage);
     }
     return account;
+  }
+
+  public static Tweet validateTweet(Tweet tweet, String errorMessage) {
+
+    if (Objects.isNull(tweet)) {
+      throw new NotFoundException(errorMessage);
+    }
+    return tweet;
   }
 }

@@ -10,5 +10,7 @@ import vincentlow.twittur.model.entity.Tweet;
 @Repository
 public interface TweetRepository extends JpaRepository<Tweet, String> {
 
-  Page<Tweet> findAllByCreatorId(String creator, Pageable pageable);
+  Page<Tweet> findAllByCreatorIdAndMarkForDeleteFalse(String creator, Pageable pageable);
+
+  Tweet findByIdAndMarkForDeleteFalse(String tweetId);
 }
