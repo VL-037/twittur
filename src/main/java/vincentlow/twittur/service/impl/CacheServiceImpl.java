@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,8 +36,7 @@ public class CacheServiceImpl implements CacheService {
       if (Objects.nonNull(cacheData)) {
         return objectMapper.readValue(cacheData, typeRef);
       }
-    } catch (JsonProcessingException e) {
-
+    } catch (Exception e) {
     }
     return null;
   }
@@ -52,8 +50,7 @@ public class CacheServiceImpl implements CacheService {
         stringRedisTemplate.opsForValue()
             .set(key, valueString, getTTL(ttl), TimeUnit.SECONDS);
       }
-    } catch (JsonProcessingException e) {
-
+    } catch (Exception e) {
     }
   }
 
