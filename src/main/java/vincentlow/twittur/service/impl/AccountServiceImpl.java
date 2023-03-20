@@ -36,7 +36,7 @@ import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
-import vincentlow.twittur.repository.AccountRelationshipRepository;
+import vincentlow.twittur.repository.service.AccountRelationshipRepositoryService;
 import vincentlow.twittur.repository.service.AccountRepositoryService;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
@@ -50,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
   private AccountRepositoryService accountRepositoryService;
 
   @Autowired
-  private AccountRelationshipRepository accountRelationshipRepository;
+  private AccountRelationshipRepositoryService accountRelationshipRepositoryService;
 
   @Override
   public Account createAccount(CreateAccountRequest request) {
@@ -192,7 +192,7 @@ public class AccountServiceImpl implements AccountService {
     followerAccount.setFollowingCount(followerAccount.getFollowingCount() + 1);
     followedAccount.setFollowersCount(followedAccount.getFollowersCount() + 1);
 
-    accountRelationshipRepository.save(relationship);
+    accountRelationshipRepositoryService.save(relationship);
     accountRepositoryService.saveAll(List.of(followerAccount, followedAccount));
   }
 
@@ -206,10 +206,11 @@ public class AccountServiceImpl implements AccountService {
         ErrorCode.FOLLOWER_ID_MUST_NOT_BE_BLANK.getMessage());
 
     AccountRelationship relationship =
-        accountRelationshipRepository.findByFollowerIdAndFollowedId(request.getFollowerId(), request.getFollowedId());
+        accountRelationshipRepositoryService.findByFollowerIdAndFollowedId(request.getFollowerId(),
+            request.getFollowedId());
 
     if (Objects.nonNull(relationship)) {
-      accountRelationshipRepository.deleteById(relationship.getId());
+      accountRelationshipRepositoryService.deleteById(relationship.getId());
 
       Account followerAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowerId());
       validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);

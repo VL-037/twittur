@@ -87,12 +87,30 @@ public class AccountRepositoryServiceImpl implements AccountRepositoryService {
   @Override
   public Page<Account> findFollowers(String accountId, PageRequest pageRequest) {
 
-    return accountRepository.findFollowers(accountId, pageRequest);
+    String key = String.format(CacheKey.FIND_ACCOUNT_FOLLOWERS, accountId);
+    List<Account> followers = cacheService.get(key, new TypeReference<>() {});
+    Page<Account> followersPage;
+    if (Objects.isNull(followers)) {
+      followersPage = accountRepository.findFollowers(accountId, pageRequest);
+      cacheService.set(key, followersPage.getContent(), null);
+    } else {
+      followersPage = new PageImpl<>(followers, pageRequest, followers.size());
+    }
+    return followersPage;
   }
 
   @Override
   public Page<Account> findFollowing(String accountId, PageRequest pageRequest) {
 
-    return accountRepository.findFollowing(accountId, pageRequest);
+    String key = String.format(CacheKey.FIND_ACCOUNT_FOLLOWING, accountId);
+    List<Account> following = cacheService.get(key, new TypeReference<>() {});
+    Page<Account> followingPage;
+    if (Objects.isNull(following)) {
+      followingPage = accountRepository.findFollowing(accountId, pageRequest);
+      cacheService.set(key, followingPage.getContent(), null);
+    } else {
+      followingPage = new PageImpl<>(following, pageRequest, following.size());
+    }
+    return followingPage;
   }
 }
