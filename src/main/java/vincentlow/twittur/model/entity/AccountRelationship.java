@@ -1,5 +1,7 @@
 package vincentlow.twittur.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,4 +20,16 @@ public class AccountRelationship extends BaseEntity {
   @ManyToOne
   @JoinColumn(name = "followed_id", referencedColumnName = "id")
   private Account followed;
+
+  @JsonIgnore
+  public Account getFollower() {
+
+    return follower;
+  }
+
+  @JsonIgnore
+  public Account getFollowed() {
+
+    return followed;
+  }
 }

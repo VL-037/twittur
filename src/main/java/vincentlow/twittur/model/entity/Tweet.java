@@ -1,5 +1,7 @@
 package vincentlow.twittur.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,4 +21,10 @@ public class Tweet extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "creator_id", referencedColumnName = "id")
   private Account creator;
+
+  @JsonIgnore
+  public Account getCreator() {
+
+    return creator;
+  }
 }

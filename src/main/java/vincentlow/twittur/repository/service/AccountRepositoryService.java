@@ -20,4 +20,8 @@ public interface AccountRepositoryService {
   void saveAll(List<Account> accounts);
 
   Account findByIdAndMarkForDeleteFalse(String id);
+
+  Page<Account> findFollowers(String accountId, PageRequest pageRequest);
+
+  Page<Account> findFollowing(String accountId, PageRequest pageRequest);
 }

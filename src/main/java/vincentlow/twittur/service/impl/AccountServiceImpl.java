@@ -224,6 +224,24 @@ public class AccountServiceImpl implements AccountService {
     }
   }
 
+  @Override
+  public Page<Account> getAccountFollowers(String username, int pageNumber, int pageSize) {
+
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    return accountRepositoryService.findFollowers(account.getId(), PageRequest.of(pageNumber, pageSize));
+  }
+
+  @Override
+  public Page<Account> getAccountFollowing(String username, int pageNumber, int pageSize) {
+
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    return accountRepositoryService.findFollowing(account.getId(), PageRequest.of(pageNumber, pageSize));
+  }
+
   private void validateRequest(CreateAccountRequest request) {
 
     validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());

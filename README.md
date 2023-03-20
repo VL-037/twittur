@@ -27,6 +27,7 @@
 - Database: [PostgreSQL](https://www.postgresql.org/download), [Redis](https://github.com/ServiceStack/redis-windows/tree/master/downloads)
 - IDE: [Intellij IDEA Community Edition](https://www.jetbrains.com/idea/download)
 - Build tool: [Maven 3.6.3](https://archive.apache.org/dist/maven/maven-3/3.6.3)
+- Run Databases
 - Add VM options `--add-opens java.base/java.lang=ALL-UNNAMED` for object mapper to work
 - Run `mvn spring-boot:run`
 - APIs will be served at `http://localhost:8080`

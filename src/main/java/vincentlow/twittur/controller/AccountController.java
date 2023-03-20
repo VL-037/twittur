@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import vincentlow.twittur.model.entity.Account;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
+import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
+import vincentlow.twittur.model.response.AccountFollowerResponse;
 import vincentlow.twittur.model.response.AccountResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiResponse;
@@ -125,6 +126,46 @@ public class AccountController extends BaseController {
     try {
       accountService.unfollow(request);
       return successResponse;
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @GetMapping("/@{username}/followers")
+  public ApiListResponse<AccountFollowerResponse> getAccountFollowers(@PathVariable String username,
+      @RequestParam(defaultValue = "0") int pageNumber,
+      @RequestParam(defaultValue = "10") int pageSize) {
+
+    try {
+      validatePageableRequest(pageNumber, pageSize);
+
+      Page<Account> followers = accountService.getAccountFollowers(username, pageNumber, pageSize);
+      List<AccountFollowerResponse> response = followers.stream()
+          .map(account -> toResponse(account, AccountFollowerResponse.class))
+          .collect(Collectors.toList());
+      PageMetaData pageMetaData = getPageMetaData(followers, pageNumber, pageSize);
+
+      return toSuccessApiResponse(response, pageMetaData);
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @GetMapping("/@{username}/following")
+  public ApiListResponse<AccountFollowerResponse> getAccountFollowing(@PathVariable String username,
+      @RequestParam(defaultValue = "0") int pageNumber,
+      @RequestParam(defaultValue = "10") int pageSize) {
+
+    try {
+      validatePageableRequest(pageNumber, pageSize);
+
+      Page<Account> followers = accountService.getAccountFollowing(username, pageNumber, pageSize);
+      List<AccountFollowerResponse> response = followers.stream()
+          .map(account -> toResponse(account, AccountFollowerResponse.class))
+          .collect(Collectors.toList());
+      PageMetaData pageMetaData = getPageMetaData(followers, pageNumber, pageSize);
+
+      return toSuccessApiResponse(response, pageMetaData);
     } catch (RuntimeException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

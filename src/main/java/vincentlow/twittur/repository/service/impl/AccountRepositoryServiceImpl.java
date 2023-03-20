@@ -83,4 +83,16 @@ public class AccountRepositoryServiceImpl implements AccountRepositoryService {
 
     return accountRepository.findByIdAndMarkForDeleteFalse(id);
   }
+
+  @Override
+  public Page<Account> findFollowers(String accountId, PageRequest pageRequest) {
+
+    return accountRepository.findFollowers(accountId, pageRequest);
+  }
+
+  @Override
+  public Page<Account> findFollowing(String accountId, PageRequest pageRequest) {
+
+    return accountRepository.findFollowing(accountId, pageRequest);
+  }
 }

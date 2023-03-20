@@ -50,7 +50,6 @@ public class Account extends BaseEntity {
   private String password;
 
   @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
-  @JsonIgnore
   private List<Tweet> tweets;
 
   @OneToMany(mappedBy = "followed")
@@ -67,4 +66,22 @@ public class Account extends BaseEntity {
 
   @Column(name = "following_count")
   private int followingCount;
+
+  @JsonIgnore
+  public List<Tweet> getTweets() {
+
+    return tweets;
+  }
+
+  @JsonIgnore
+  public List<AccountRelationship> getFollowers() {
+
+    return followers;
+  }
+
+  @JsonIgnore
+  public List<AccountRelationship> getFollowing() {
+
+    return following;
+  }
 }

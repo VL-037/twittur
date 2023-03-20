@@ -3,8 +3,8 @@ package vincentlow.twittur.service;
 import org.springframework.data.domain.Page;
 
 import vincentlow.twittur.model.entity.Account;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
+import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 
 public interface AccountService {
@@ -22,4 +22,8 @@ public interface AccountService {
   void follow(AccountRelationshipRequest request);
 
   void unfollow(AccountRelationshipRequest request);
+
+  Page<Account> getAccountFollowers(String username, int pageNumber, int pageSize);
+
+  Page<Account> getAccountFollowing(String username, int pageNumber, int pageSize);
 }
