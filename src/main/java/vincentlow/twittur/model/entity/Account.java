@@ -3,16 +3,20 @@ package vincentlow.twittur.model.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "account")
 @Data
+@NoArgsConstructor
 public class Account extends BaseEntity {
 
   @Column(name = "first_name")
@@ -46,6 +50,7 @@ public class Account extends BaseEntity {
   private String password;
 
   @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
+  @JsonIgnore
   private List<Tweet> tweets;
 
   @OneToMany(mappedBy = "followed")

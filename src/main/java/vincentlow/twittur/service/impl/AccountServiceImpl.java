@@ -37,7 +37,7 @@ import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 import vincentlow.twittur.repository.AccountRelationshipRepository;
-import vincentlow.twittur.repository.AccountRepository;
+import vincentlow.twittur.repository.service.AccountRepositoryService;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
 
@@ -47,7 +47,7 @@ public class AccountServiceImpl implements AccountService {
   private final String DUMMY_REQUESTS_PATH = "dummy_requests/accounts.json";
 
   @Autowired
-  private AccountRepository accountRepository;
+  private AccountRepositoryService accountRepositoryService;
 
   @Autowired
   private AccountRelationshipRepository accountRelationshipRepository;
@@ -58,12 +58,12 @@ public class AccountServiceImpl implements AccountService {
     StringUtil.trimStrings(request);
     validateRequest(request);
 
-    Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+    Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
 
-    existingAccount = accountRepository.findByEmailAddress(request.getEmailAddress());
+    existingAccount = accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
@@ -86,26 +86,26 @@ public class AccountServiceImpl implements AccountService {
     account.setUpdatedBy("system");
     account.setUpdatedDate(now);
 
-    return accountRepository.save(account);
+    return accountRepositoryService.save(account);
   }
 
   @Override
   public Page<Account> findAccounts(int pageNumber, int pageSize) {
 
-    return accountRepository.findAll(PageRequest.of(pageNumber, pageSize));
+    return accountRepositoryService.findAll(PageRequest.of(pageNumber, pageSize));
   }
 
   @Override
   public Account findAccountByUsername(String username) {
 
-    Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);;
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);;
     return validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
   }
 
   @Override
   public Account updateAccountByUsername(String username, UpdateAccountRequest request) {
 
-    Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
@@ -113,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
 
     if (!request.getUsername()
         .equals(account.getUsername())) {
-      Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(account.getUsername());
+      Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(account.getUsername());
       if (Objects.nonNull(existingAccount)) {
         throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
       }
@@ -121,7 +121,8 @@ public class AccountServiceImpl implements AccountService {
 
     if (!request.getEmailAddress()
         .equals(account.getEmailAddress())) {
-      Account existingAccount = accountRepository.findByEmailAddress(account.getEmailAddress());
+      Account existingAccount =
+          accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(account.getEmailAddress());
       if (Objects.nonNull(existingAccount)) {
         throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
       }
@@ -142,7 +143,7 @@ public class AccountServiceImpl implements AccountService {
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
-    return accountRepository.save(account);
+    return accountRepositoryService.save(account);
   }
 
   @Override
@@ -157,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
       List<Account> accounts = requests.stream()
           .map(this::convertToAccount)
           .collect(Collectors.toList());
-      accountRepository.saveAll(accounts);
+      accountRepositoryService.saveAll(accounts);
     } catch (IOException e) {
       throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
     }
@@ -172,10 +173,10 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(StringUtils.isNotBlank(request.getFollowerId()),
         ErrorCode.FOLLOWER_ID_MUST_NOT_BE_BLANK.getMessage());
 
-    Account followerAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowerId());
+    Account followerAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowerId());
     validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
 
-    Account followedAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowedId());
+    Account followedAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowedId());
     validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
 
     AccountRelationship relationship = new AccountRelationship();
@@ -192,7 +193,7 @@ public class AccountServiceImpl implements AccountService {
     followedAccount.setFollowersCount(followedAccount.getFollowersCount() + 1);
 
     accountRelationshipRepository.save(relationship);
-    accountRepository.saveAll(List.of(followerAccount, followedAccount));
+    accountRepositoryService.saveAll(List.of(followerAccount, followedAccount));
   }
 
   @Override
@@ -210,16 +211,16 @@ public class AccountServiceImpl implements AccountService {
     if (Objects.nonNull(relationship)) {
       accountRelationshipRepository.deleteById(relationship.getId());
 
-      Account followerAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowerId());
+      Account followerAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowerId());
       validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
 
-      Account followedAccount = accountRepository.findByIdAndMarkForDeleteFalse(request.getFollowedId());
+      Account followedAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowedId());
       validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
 
       followerAccount.setFollowingCount(followerAccount.getFollowingCount() - 1);
       followedAccount.setFollowersCount(followedAccount.getFollowersCount() - 1);
 
-      accountRepository.saveAll(List.of(followerAccount, followedAccount));
+      accountRepositoryService.saveAll(List.of(followerAccount, followedAccount));
     }
   }
 
@@ -318,12 +319,12 @@ public class AccountServiceImpl implements AccountService {
 
   private Account convertToAccount(CreateAccountRequest request) {
 
-    Account existingAccount = accountRepository.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+    Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
     }
 
-    existingAccount = accountRepository.findByEmailAddress(request.getEmailAddress());
+    existingAccount = accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
     if (Objects.nonNull(existingAccount)) {
       throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
     }
