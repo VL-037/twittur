@@ -2,7 +2,11 @@ package vincentlow.twittur.utils;
 
 import java.util.Objects;
 
+import org.springframework.beans.BeanUtils;
+
+import vincentlow.twittur.model.entity.DirectMessage;
 import vincentlow.twittur.model.response.BaseResponse;
+import vincentlow.twittur.model.response.DirectMessageResponse;
 
 public class ObjectMappingHelper {
 
@@ -16,5 +20,18 @@ public class ObjectMappingHelper {
     } catch (Exception e) {
       return null;
     }
+  }
+
+  public static DirectMessageResponse toDirectMessageResponse(DirectMessage directMessage) {
+
+    DirectMessageResponse response = DirectMessageResponse.builder()
+        .senderId(directMessage.getSender()
+            .getId())
+        .recipientId(directMessage.getRecipient()
+            .getId())
+        .build();
+    BeanUtils.copyProperties(directMessage, response);
+
+    return response;
   }
 }

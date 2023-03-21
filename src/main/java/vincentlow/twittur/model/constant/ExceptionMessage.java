@@ -11,6 +11,8 @@ public interface ExceptionMessage {
   String ACCOUNT_NOT_FOUND = "account not found";
   String FOLLOWED_ACCOUNT_NOT_FOUND = "followed account not found";
   String FOLLOWER_ACCOUNT_NOT_FOUND = "follower account not found";
+  String SENDER_ACCOUNT_NOT_FOUND = "sender account not found";
+  String RECIPIENT_ACCOUNT_NOT_FOUND = "recipient account not found";
   String USERNAME_IS_TAKEN = "username is taken";
   String EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT = "email is associated with an account, please login or reset password";
 

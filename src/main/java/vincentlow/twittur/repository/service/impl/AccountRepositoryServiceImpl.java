@@ -56,7 +56,6 @@ public class AccountRepositoryServiceImpl implements AccountRepositoryService {
 
     String key = String.format(CacheKey.FIND_ONE_ACCOUNT, username);
     Account account = cacheService.get(key, new TypeReference<>() {});
-
     if (Objects.isNull(account)) {
       account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
       cacheService.set(key, account, null);

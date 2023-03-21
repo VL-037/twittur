@@ -52,11 +52,17 @@ public class Account extends BaseEntity {
   @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
   private List<Tweet> tweets;
 
-  @OneToMany(mappedBy = "followed")
+  @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
   private List<AccountRelationship> followers;
 
-  @OneToMany(mappedBy = "follower")
+  @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
   private List<AccountRelationship> following;
+
+  @OneToMany(mappedBy = "sender")
+  private List<DirectMessage> sentMessages;
+
+  @OneToMany(mappedBy = "recipient")
+  private List<DirectMessage> receivedMessages;
 
   @Column(name = "tweets_count")
   private int tweetsCount;
@@ -83,5 +89,17 @@ public class Account extends BaseEntity {
   public List<AccountRelationship> getFollowing() {
 
     return following;
+  }
+
+  @JsonIgnore
+  public List<DirectMessage> getSentMessages() {
+
+    return sentMessages;
+  }
+
+  @JsonIgnore
+  public List<DirectMessage> getReceivedMessages() {
+
+    return receivedMessages;
   }
 }

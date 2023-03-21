@@ -57,8 +57,11 @@ public class CacheServiceImpl implements CacheService {
   @Override
   public void deleteByPattern(String pattern) {
 
-    Set<String> keys = stringRedisTemplate.keys(pattern);
-    stringRedisTemplate.delete(keys);
+    try {
+      Set<String> keys = stringRedisTemplate.keys(pattern);
+      stringRedisTemplate.delete(keys);
+    } catch (Exception e) {
+    }
   }
 
   private long getTTL(Long ttl) {
