@@ -49,13 +49,13 @@ public class Account extends BaseEntity {
   @Column(name = "password")
   private String password;
 
-  @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "creator")
   private List<Tweet> tweets;
 
-  @OneToMany(mappedBy = "followed", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "followed")
   private List<AccountRelationship> followers;
 
-  @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "follower")
   private List<AccountRelationship> following;
 
   @OneToMany(mappedBy = "sender")
@@ -63,6 +63,9 @@ public class Account extends BaseEntity {
 
   @OneToMany(mappedBy = "recipient")
   private List<DirectMessage> receivedMessages;
+
+  @OneToMany(mappedBy = "recipient")
+  private List<Notification> notifications;
 
   @Column(name = "tweets_count")
   private int tweetsCount;

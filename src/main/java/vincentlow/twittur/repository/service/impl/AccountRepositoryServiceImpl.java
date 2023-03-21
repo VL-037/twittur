@@ -99,6 +99,12 @@ public class AccountRepositoryServiceImpl implements AccountRepositoryService {
   }
 
   @Override
+  public List<Account> findAllFollowers(String accountId) {
+
+    return accountRepository.findAllFollowers(accountId);
+  }
+
+  @Override
   public Page<Account> findFollowing(String accountId, PageRequest pageRequest) {
 
     String key = String.format(CacheKey.FIND_ACCOUNT_FOLLOWING, accountId);

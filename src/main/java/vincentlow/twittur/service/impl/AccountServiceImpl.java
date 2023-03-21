@@ -81,6 +81,7 @@ public class AccountServiceImpl implements AccountService {
     account.setFollowing(Collections.EMPTY_LIST);
     account.setSentMessages(Collections.EMPTY_LIST);
     account.setReceivedMessages(Collections.EMPTY_LIST);
+    account.setNotifications(Collections.EMPTY_LIST);
 
     LocalDateTime now = LocalDateTime.now();
     account.setCreatedBy("system");
@@ -363,6 +364,7 @@ public class AccountServiceImpl implements AccountService {
     account.setFollowing(Collections.EMPTY_LIST);
     account.setSentMessages(Collections.EMPTY_LIST);
     account.setReceivedMessages(Collections.EMPTY_LIST);
+    account.setNotifications(Collections.EMPTY_LIST);
 
     LocalDateTime now = LocalDateTime.now();
     account.setCreatedBy("system");

@@ -18,7 +18,7 @@ public class Tweet extends BaseEntity {
   @Column(name = "message")
   private String message;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "creator_id", referencedColumnName = "id")
   private Account creator;
 

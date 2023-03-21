@@ -1,5 +1,7 @@
 package vincentlow.twittur.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +23,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
   @Query("SELECT a FROM Account a JOIN AccountRelationship ar ON a.id = ar.follower.id WHERE ar.followed.id = :accountId")
   Page<Account> findFollowers(String accountId, Pageable pageable);
+
+  @Query("SELECT a FROM Account a JOIN AccountRelationship ar ON a.id = ar.follower.id WHERE ar.followed.id = :accountId")
+  List<Account> findAllFollowers(String accountId);
 
   @Query("SELECT a FROM Account a JOIN AccountRelationship ar ON a.id = ar.followed.id WHERE ar.follower.id = :accountId")
   Page<Account> findFollowing(String accountId, Pageable pageable);

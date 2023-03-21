@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.util.StringUtils;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
+import vincentlow.twittur.model.constant.NotificationType;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
@@ -99,14 +100,15 @@ public class TweetServiceImpl implements TweetService {
     String notificationTitle = String.format("%s Tweeted:", creator.getAccountName());
     String notificationMessage = String.format(tweet.getMessage());
     String notificationImageUrl = "IMAGE_URL";
-    String notificationRedirectUrl =
-        String.format("https://twittur.com/@%s/tweets/%s", creator.getUsername(), tweet.getId());
+    String notificationRedirectUrl = String.format("/@%s/tweets/%s", creator.getUsername(), tweet.getId());
 
     PushNotificationRequest pushNotificationRequest = PushNotificationRequest.builder()
+        .senderId(creator.getId())
         .title(notificationTitle)
         .message(notificationMessage)
         .imageUrl(notificationImageUrl)
         .redirectUrl(notificationRedirectUrl)
+        .type(NotificationType.NEW_TWEET)
         .build();
 
     kafkaPublisherService.pushNotification(pushNotificationRequest);

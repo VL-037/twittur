@@ -23,5 +23,7 @@ public interface AccountRepositoryService {
 
   Page<Account> findFollowers(String accountId, PageRequest pageRequest);
 
+  List<Account> findAllFollowers(String accountId);
+
   Page<Account> findFollowing(String accountId, PageRequest pageRequest);
 }
