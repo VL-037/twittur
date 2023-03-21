@@ -27,10 +27,12 @@ import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
+import vincentlow.twittur.model.request.PushNotificationRequest;
 import vincentlow.twittur.model.request.UpdateTweetRequest;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.repository.TweetRepository;
+import vincentlow.twittur.service.KafkaPublisherService;
 import vincentlow.twittur.service.TweetService;
 
 @Service
@@ -43,6 +45,9 @@ public class TweetServiceImpl implements TweetService {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private KafkaPublisherService kafkaPublisherService;
 
   @Override
   public Page<Tweet> findAccountTweets(String username, int pageNumber, int pageSize) {
@@ -73,23 +78,39 @@ public class TweetServiceImpl implements TweetService {
     validateArgument(request.getMessage()
         .length() <= 250, ErrorCode.MESSAGE_MAXIMAL_LENGTH_IS_250.getMessage());
 
-    Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
-    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+    Account creator = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(creator, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     Tweet tweet = new Tweet();
     BeanUtils.copyProperties(request, tweet);
 
     LocalDateTime now = LocalDateTime.now();
-    tweet.setCreator(account);
-    tweet.setCreatedBy(account.getId());
+    tweet.setCreator(creator);
+    tweet.setCreatedBy(creator.getId());
     tweet.setCreatedDate(now);
-    tweet.setUpdatedBy(account.getId());
+    tweet.setUpdatedBy(creator.getId());
     tweet.setUpdatedDate(now);
 
-    account.setTweetsCount(account.getTweetsCount() + 1);
-    accountRepository.save(account);
+    creator.setTweetsCount(creator.getTweetsCount() + 1);
+    accountRepository.save(creator);
 
-    return tweetRepository.save(tweet);
+    tweet = tweetRepository.save(tweet);
+
+    String notificationTitle = String.format("%s Tweeted:", creator.getAccountName());
+    String notificationMessage = String.format(tweet.getMessage());
+    String notificationImageUrl = "IMAGE_URL";
+    String notificationRedirectUrl =
+        String.format("https://twittur.com/@%s/tweets/%s", creator.getUsername(), tweet.getId());
+
+    PushNotificationRequest pushNotificationRequest = PushNotificationRequest.builder()
+        .title(notificationTitle)
+        .message(notificationMessage)
+        .imageUrl(notificationImageUrl)
+        .redirectUrl(notificationRedirectUrl)
+        .build();
+
+    kafkaPublisherService.pushNotification(pushNotificationRequest);
+    return tweet;
   }
 
   @Override
