@@ -35,6 +35,6 @@ public class Notification extends BaseEntity {
   @Column(name = "type")
   private NotificationType type;
 
-  @Column(name = "is_read")
-  private boolean isRead;
+  @Column(name = "has_read")
+  private boolean hasRead;
 }

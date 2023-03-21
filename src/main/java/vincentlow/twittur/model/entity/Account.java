@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -104,5 +103,11 @@ public class Account extends BaseEntity {
   public List<DirectMessage> getReceivedMessages() {
 
     return receivedMessages;
+  }
+
+  @JsonIgnore
+  public List<Notification> getNotifications() {
+
+    return notifications;
   }
 }
