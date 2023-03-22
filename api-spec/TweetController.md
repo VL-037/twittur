@@ -3,6 +3,7 @@
 - [Get Account Tweets](#get-account-tweets)
 - [Get Account Tweet by ID](#get-account-tweet-by-id)
 - [Post Tweet](#post-tweet)
+- [Update Tweet](#update-tweet)
 
 ---
 
@@ -232,3 +233,67 @@
 }
 ```
 
+## <a name="update-tweet"></a> Update Tweet
+
+**Http Method**: `PUT`
+
+**Endpoint**: `/api/v1/accounts/@{username}/tweets/{tweetId}`
+
+**Request Param**: -
+
+**Request Body**:
+
+```json
+{
+  "message": "The sun is shining and the birds are singing. What a beautiful day! 🌟 #motivation #inspiration"
+}
+```
+
+**Response**:
+
+- response sample &rarr; `/@johndoe123/tweets/c2a86195-8e40-402c-ba1c-16308ee672fa`
+
+```json
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "id": "c2a86195-8e40-402c-ba1c-16308ee672fa",
+    "createdDate": "2023-03-22T03:16:18.731869",
+    "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+    "updatedDate": "2023-03-23T04:49:40.967183",
+    "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+    "message": "Updated tweet message"
+  }
+}
+```
+
+- response sample &rarr; `username` not found
+
+```json
+{
+  "code": 404,
+  "status": "NOT_FOUND",
+  "error": "account not found"
+}
+```
+
+- response sample &rarr; `tweetId` not found
+
+```json
+{
+  "code": 404,
+  "status": "NOT_FOUND",
+  "error": "tweet not found"
+}
+```
+
+- response sample &rarr; Server Error
+
+```json
+{
+  "code": 503,
+  "status": "SERVICE_UNAVAILABLE",
+  "error": "service temporarily unavailable"
+}
+```

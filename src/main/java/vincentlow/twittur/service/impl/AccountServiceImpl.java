@@ -208,18 +208,18 @@ public class AccountServiceImpl implements AccountService {
     validateArgument(StringUtils.isNotBlank(request.getFollowerId()),
         ErrorCode.FOLLOWER_ID_MUST_NOT_BE_BLANK.getMessage());
 
+    Account followerAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowerId());
+    validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
+
+    Account followedAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowedId());
+    validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
+
     AccountRelationship relationship =
         accountRelationshipRepositoryService.findByFollowerIdAndFollowedId(request.getFollowerId(),
             request.getFollowedId());
 
     if (Objects.nonNull(relationship)) {
       accountRelationshipRepositoryService.deleteById(relationship.getId());
-
-      Account followerAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowerId());
-      validateAccount(followerAccount, ExceptionMessage.FOLLOWER_ACCOUNT_NOT_FOUND);
-
-      Account followedAccount = accountRepositoryService.findByIdAndMarkForDeleteFalse(request.getFollowedId());
-      validateAccount(followedAccount, ExceptionMessage.FOLLOWED_ACCOUNT_NOT_FOUND);
 
       followerAccount.setFollowingCount(followerAccount.getFollowingCount() - 1);
       followedAccount.setFollowersCount(followedAccount.getFollowersCount() - 1);
