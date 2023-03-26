@@ -10,5 +10,6 @@ import vincentlow.twittur.model.entity.DirectMessage;
 @Repository
 public interface DirectMessageRepository extends JpaRepository<DirectMessage, String> {
 
-  Page<DirectMessage> findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(String senderId, String receiverId, Pageable pageable);
+  Page<DirectMessage> findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(String senderId, String recipientId,
+      Pageable pageable);
 }
