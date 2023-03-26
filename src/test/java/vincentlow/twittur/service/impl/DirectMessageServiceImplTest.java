@@ -40,7 +40,7 @@ public class DirectMessageServiceImplTest {
 
   private final int PAGE_SIZE = 10;
 
-  private final PageRequest pageRequest = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
+  private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
 
   @InjectMocks
   private DirectMessageServiceImpl directMessageService;
@@ -90,7 +90,7 @@ public class DirectMessageServiceImplTest {
     senderToRecipientMessageList.add(senderToRecipientMessage);
 
     senderToRecipientMessagePage =
-        new PageImpl<>(senderToRecipientMessageList, pageRequest, senderToRecipientMessageList.size());
+        new PageImpl<>(senderToRecipientMessageList, PAGE_REQUEST, senderToRecipientMessageList.size());
 
     recipientToSenderMessage = new DirectMessage();
     recipientToSenderMessage.setSender(recipient);
@@ -102,7 +102,7 @@ public class DirectMessageServiceImplTest {
     recipientToSenderMessageList.add(recipientToSenderMessage);
 
     recipientToSenderMessagePage =
-        new PageImpl<>(recipientToSenderMessageList, pageRequest, recipientToSenderMessageList.size());
+        new PageImpl<>(recipientToSenderMessageList, PAGE_REQUEST, recipientToSenderMessageList.size());
 
     directMessageRequest = DirectMessageRequest.builder()
         .message(MESSAGE)
@@ -113,9 +113,9 @@ public class DirectMessageServiceImplTest {
     when(directMessageRepository.save(any(DirectMessage.class))).thenReturn(senderToRecipientMessage);
 
     when(directMessageRepository.findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(SENDER_ID, RECIPIENT_ID,
-        pageRequest)).thenReturn(senderToRecipientMessagePage);
+            PAGE_REQUEST)).thenReturn(senderToRecipientMessagePage);
     when(directMessageRepository.findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, SENDER_ID,
-        pageRequest)).thenReturn(recipientToSenderMessagePage);
+            PAGE_REQUEST)).thenReturn(recipientToSenderMessagePage);
   }
 
   @AfterEach
@@ -148,9 +148,9 @@ public class DirectMessageServiceImplTest {
     verify(accountRepositoryService).findByIdAndMarkForDeleteFalse(SENDER_ID);
     verify(accountRepositoryService).findByIdAndMarkForDeleteFalse(RECIPIENT_ID);
     verify(directMessageRepository).findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(SENDER_ID, RECIPIENT_ID,
-        pageRequest);
+            PAGE_REQUEST);
     verify(directMessageRepository).findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, SENDER_ID,
-        pageRequest);
+            PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());

@@ -1,6 +1,10 @@
 package vincentlow.twittur.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -8,6 +12,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,8 +62,14 @@ public class CacheServiceImplTest {
 
     keys = new HashSet<>();
 
-    when(stringRedisTemplate.opsForValue()).thenReturn(null);
+    valueOperations = mock(ValueOperations.class);
+    when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+    when(valueOperations.get(KEY)).thenReturn(CACHE_DATA);
+    when(objectMapper.readValue(eq(CACHE_DATA), any(TypeReference.class))).thenReturn(account);
+
     when(objectMapper.writeValueAsString(account)).thenReturn(CACHE_DATA);
+    doNothing().when(valueOperations)
+        .set(KEY, CACHE_DATA, TTL, TimeUnit.SECONDS);
     when(stringRedisTemplate.keys(KEY_PATTERN)).thenReturn(keys);
   }
 
@@ -69,13 +80,14 @@ public class CacheServiceImplTest {
   }
 
   @Test
-  void get() {
+  void get() throws JsonProcessingException {
 
     Account result = cacheService.get(KEY, new TypeReference<>() {});
 
     verify(stringRedisTemplate).opsForValue();
+    verify(objectMapper).readValue(eq(CACHE_DATA), any(TypeReference.class));
 
-    assertNull(result);
+    assertNotNull(result);
   }
 
   @Test

@@ -58,7 +58,7 @@ public class TweetServiceImplTest {
 
   private final int PAGE_SIZE = 10;
 
-  private final PageRequest pageRequest = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
+  private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
 
   private Account creator;
 
@@ -89,7 +89,7 @@ public class TweetServiceImplTest {
     tweetList = new ArrayList<>();
     tweetList.add(tweet);
 
-    tweetPage = new PageImpl<>(tweetList, pageRequest, tweetList.size());
+    tweetPage = new PageImpl<>(tweetList, PAGE_REQUEST, tweetList.size());
 
     createTweetRequest = CreateTweetRequest.builder()
         .message(MESSAGE)
@@ -100,7 +100,7 @@ public class TweetServiceImplTest {
         .build();
 
     when(accountRepository.findByUsernameAndMarkForDeleteFalse(USERNAME)).thenReturn(creator);
-    when(tweetRepository.findAllByCreatorIdAndMarkForDeleteFalse(CREATOR_ID, pageRequest)).thenReturn(tweetPage);
+    when(tweetRepository.findAllByCreatorIdAndMarkForDeleteFalse(CREATOR_ID, PAGE_REQUEST)).thenReturn(tweetPage);
 
     when(tweetRepository.findByIdAndMarkForDeleteFalse(TWEET_ID)).thenReturn(tweet);
 
@@ -124,7 +124,7 @@ public class TweetServiceImplTest {
     Page<Tweet> result = tweetService.findAccountTweets(USERNAME, PAGE_NUMBER, PAGE_SIZE);
 
     verify(accountRepository).findByUsernameAndMarkForDeleteFalse(USERNAME);
-    verify(tweetRepository).findAllByCreatorIdAndMarkForDeleteFalse(CREATOR_ID, pageRequest);
+    verify(tweetRepository).findAllByCreatorIdAndMarkForDeleteFalse(CREATOR_ID, PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());

@@ -64,7 +64,7 @@ public class AccountServiceImplTest {
 
   private final int PAGE_SIZE = 10;
 
-  private final PageRequest pageRequest = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
+  private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
 
   private final String ACCOUNT_RELATIONSHIP_ID = "ACCOUNT_RELATIONSHIP_ID";
 
@@ -116,7 +116,7 @@ public class AccountServiceImplTest {
     accountList = new ArrayList<>();
     accountList.add(account);
 
-    accountPage = new PageImpl<>(accountList, pageRequest, accountList.size());
+    accountPage = new PageImpl<>(accountList, PAGE_REQUEST, accountList.size());
 
     createAccountRequest = CreateAccountRequest.builder()
         .firstName(FIRST_NAME)
@@ -160,7 +160,7 @@ public class AccountServiceImplTest {
     followerList.add(follower1);
     followerList.add(follower2);
 
-    followersPage = new PageImpl<>(followerList, pageRequest, followerList.size());
+    followersPage = new PageImpl<>(followerList, PAGE_REQUEST, followerList.size());
 
     List<Account> followingList = new ArrayList<>();
     Account following1 = new Account();
@@ -168,7 +168,7 @@ public class AccountServiceImplTest {
     followingList.add(following1);
     followingList.add(following2);
 
-    followingPage = new PageImpl<>(followingList, pageRequest, followingList.size());
+    followingPage = new PageImpl<>(followingList, PAGE_REQUEST, followingList.size());
 
     when(accountRepositoryService.findByUsernameAndMarkForDeleteFalse(USERNAME)).thenReturn(account);
     when(accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(EMAIL_ADDRESS)).thenReturn(account);
@@ -187,9 +187,9 @@ public class AccountServiceImplTest {
     doNothing().when(accountRelationshipRepositoryService)
         .deleteById(ACCOUNT_RELATIONSHIP_ID);
 
-    when(accountRepositoryService.findFollowers(account.getId(), pageRequest))
+    when(accountRepositoryService.findFollowers(account.getId(), PAGE_REQUEST))
         .thenReturn(followersPage);
-    when(accountRepositoryService.findFollowing(account.getId(), pageRequest))
+    when(accountRepositoryService.findFollowing(account.getId(), PAGE_REQUEST))
         .thenReturn(followingPage);
   }
 
@@ -220,7 +220,7 @@ public class AccountServiceImplTest {
 
     Page<Account> result = accountService.findAccounts(PAGE_NUMBER, PAGE_SIZE);
 
-    verify(accountRepositoryService).findAll(pageRequest);
+    verify(accountRepositoryService).findAll(PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());
@@ -297,7 +297,7 @@ public class AccountServiceImplTest {
     Page<Account> result = accountService.getAccountFollowers(USERNAME, PAGE_NUMBER, PAGE_SIZE);
 
     verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
-    verify(accountRepositoryService).findFollowers(account.getId(), pageRequest);
+    verify(accountRepositoryService).findFollowers(account.getId(), PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());
@@ -310,7 +310,7 @@ public class AccountServiceImplTest {
     Page<Account> result = accountService.getAccountFollowing(USERNAME, PAGE_NUMBER, PAGE_SIZE);
 
     verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
-    verify(accountRepositoryService).findFollowing(account.getId(), pageRequest);
+    verify(accountRepositoryService).findFollowing(account.getId(), PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());

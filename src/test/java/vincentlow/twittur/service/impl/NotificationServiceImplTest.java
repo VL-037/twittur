@@ -32,7 +32,7 @@ public class NotificationServiceImplTest {
 
   private final int PAGE_SIZE = 10;
 
-  private final PageRequest pageRequest = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
+  private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
 
   @InjectMocks
   private NotificationServiceImpl notificationService;
@@ -65,10 +65,10 @@ public class NotificationServiceImplTest {
     notificationList = new ArrayList<>();
     notificationList.add(notification);
 
-    notificationPage = new PageImpl<>(notificationList, pageRequest, notificationList.size());
+    notificationPage = new PageImpl<>(notificationList, PAGE_REQUEST, notificationList.size());
 
     when(accountRepositoryService.findByIdAndMarkForDeleteFalse(RECIPIENT_ID)).thenReturn(recipient);
-    when(notificationRepository.findAllByRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, pageRequest))
+    when(notificationRepository.findAllByRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, PAGE_REQUEST))
         .thenReturn(notificationPage);
   }
 
@@ -84,7 +84,7 @@ public class NotificationServiceImplTest {
     Page<Notification> result = notificationService.getNotifications(RECIPIENT_ID, PAGE_NUMBER, PAGE_SIZE);
 
     verify(accountRepositoryService).findByIdAndMarkForDeleteFalse(RECIPIENT_ID);
-    verify(notificationRepository).findAllByRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, pageRequest);
+    verify(notificationRepository).findAllByRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());
