@@ -36,7 +36,7 @@ public class ExceptionController extends BaseController {
   }
 
   @ExceptionHandler(value = {DataAccessException.class, ServiceUnavailableException.class})
-  public ApiResponse handleServiceUnavailableException() {
+  public ApiResponse handleServiceUnavailableException(RuntimeException ex) {
 
     return toErrorApiResponse(HttpStatus.SERVICE_UNAVAILABLE, ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
   }

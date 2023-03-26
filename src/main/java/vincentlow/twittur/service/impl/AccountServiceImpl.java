@@ -333,7 +333,7 @@ public class AccountServiceImpl implements AccountService {
 
   private boolean validateBioLength(String bio) {
 
-    if (bio.isBlank()) {
+    if (Objects.isNull(bio) || bio.isBlank()) {
       return true;
     }
     return bio.length() < 100;

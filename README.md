@@ -23,6 +23,7 @@
   - Caching
   - Data Streaming
   - Exception Handling: [ExceptionController.java](/src/main/java/vincentlow/twittur/controller/ExceptionController.java)
+  - Unit Test: [/test](/src/test/java/vincentlow/twittur)
 
 ## Project Configuration
 
