@@ -1,18 +1,23 @@
 package vincentlow.twittur.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,14 +28,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
 import vincentlow.twittur.model.request.UpdateTweetRequest;
-import vincentlow.twittur.model.response.TweetResponse;
-import vincentlow.twittur.model.response.api.ApiListResponse;
-import vincentlow.twittur.model.response.api.ApiResponse;
-import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.service.TweetService;
 
 public class TweetControllerTest {
@@ -47,11 +55,23 @@ public class TweetControllerTest {
 
   private final String TWEET_ID = "TWEET_ID";
 
+  private final String TWEET_API_PATH = ApiPath.ACCOUNT + "/@" + USERNAME + "/tweets";
+
   @InjectMocks
   private TweetController tweetController;
 
   @Mock
   private TweetService tweetService;
+
+  private MockMvc mockMvc;
+
+  private ObjectMapper objectMapper;
+
+  private Map<String, String> params;
+
+  private MultiValueMap<String, String> multiValueParams;
+
+  private HttpStatus httpStatus;
 
   private Tweet tweet;
 
@@ -67,6 +87,11 @@ public class TweetControllerTest {
   void setUp() {
 
     openMocks(this);
+    mockMvc = standaloneSetup(tweetController).build();
+
+    objectMapper = new ObjectMapper();
+
+    httpStatus = HttpStatus.OK;
 
     tweet = new Tweet();
     tweet.setMessage(MESSAGE);
@@ -83,6 +108,15 @@ public class TweetControllerTest {
     updateTweetRequest = UpdateTweetRequest.builder()
         .message(MESSAGE)
         .build();
+
+    params = new HashMap<>();
+    params.put("pageNumber", String.valueOf(PAGE_NUMBER));
+    params.put("pageSize", String.valueOf(PAGE_SIZE));
+
+    multiValueParams = new LinkedMultiValueMap<>();
+    for (Map.Entry<String, String> entry : params.entrySet()) {
+      multiValueParams.add(entry.getKey(), entry.getValue());
+    }
 
     when(tweetService.findAccountTweets(USERNAME, PAGE_NUMBER, PAGE_SIZE)).thenReturn(tweetPage);
     when(tweetService.findAccountTweetById(USERNAME, TWEET_ID)).thenReturn(tweet);
@@ -101,95 +135,90 @@ public class TweetControllerTest {
   }
 
   @Test
-  void getAccountTweets() {
+  void getAccountTweets() throws Exception {
 
-    ApiListResponse<TweetResponse> result = tweetController.getAccountTweets(USERNAME, PAGE_NUMBER, PAGE_SIZE);
+    this.mockMvc.perform(get(TWEET_API_PATH).accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .queryParams(multiValueParams))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.content[0].message", equalTo(MESSAGE)))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).findAccountTweets(USERNAME, PAGE_NUMBER, PAGE_SIZE);
-
-    assertNotNull(result);
-    assertNotNull(result.getContent());
-    assertFalse(result.getContent()
-        .isEmpty());
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
-    assertTrue(result.getContent()
-        .size() > 0);
   }
 
   @Test
-  void getAccountTweetById() {
+  void getAccountTweetById() throws Exception {
 
-    ApiSingleResponse<TweetResponse> result = tweetController.getAccountTweetById(USERNAME, TWEET_ID);
+    this.mockMvc
+        .perform(get(TWEET_API_PATH + "/" + TWEET_ID).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.data.message", equalTo(MESSAGE)))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).findAccountTweetById(USERNAME, TWEET_ID);
-
-    assertNotNull(result);
-    assertNotNull(result.getData());
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
-    assertEquals(MESSAGE, result.getData()
-        .getMessage());
   }
 
   @Test
-  void postTweet() {
+  void postTweet() throws Exception {
 
-    ApiSingleResponse<TweetResponse> result = tweetController.postTweet(USERNAME, createTweetRequest);
+    this.mockMvc.perform(post(TWEET_API_PATH).accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(createTweetRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.data.message", equalTo(MESSAGE)))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).createTweet(USERNAME, createTweetRequest);
-
-    assertNotNull(result);
-    assertNotNull(result.getData());
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
-    assertEquals(MESSAGE, result.getData()
-        .getMessage());
   }
 
   @Test
-  void initDummyTweets() {
+  void initDummyTweets() throws Exception {
 
-    ApiResponse result = tweetController.initDummyTweets(USERNAME);
+    this.mockMvc.perform(post(TWEET_API_PATH + "/init").accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).initDummyTweets(USERNAME);
-
-    assertNotNull(result);
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
   }
 
   @Test
-  void updateAccountTweet() {
+  void updateAccountTweet() throws Exception {
 
-    ApiSingleResponse<TweetResponse> result =
-        tweetController.updateAccountTweet(USERNAME, TWEET_ID, updateTweetRequest);
+    this.mockMvc
+        .perform(put(TWEET_API_PATH + "/" + TWEET_ID).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateTweetRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.data.message", equalTo(MESSAGE)))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).updateAccountTweet(USERNAME, TWEET_ID, updateTweetRequest);
-
-    assertNotNull(result);
-    assertNotNull(result.getData());
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
-    assertEquals(MESSAGE, result.getData()
-        .getMessage());
   }
 
   @Test
-  void deleteAccountTweet() {
+  void deleteAccountTweet() throws Exception {
 
-    ApiResponse result = tweetController.deleteAccountTweet(USERNAME, TWEET_ID);
+    this.mockMvc
+        .perform(delete(TWEET_API_PATH + "/" + TWEET_ID).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(tweetService).deleteAccountTweet(USERNAME, TWEET_ID);
-
-    assertNotNull(result);
-    assertEquals(HttpStatus.OK.value(), result.getCode());
-    assertEquals(HttpStatus.OK.name(), result.getStatus());
-    assertNull(result.getError());
   }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Notification;
 import vincentlow.twittur.model.request.GetNotificationRequest;
 import vincentlow.twittur.model.response.NotificationResponse;
@@ -23,7 +24,7 @@ import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.NotificationService;
 
 @RestController
-@RequestMapping(value = "/api/v1/notifications", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = ApiPath.NOTIFICATION, produces = MediaType.APPLICATION_JSON_VALUE)
 public class NotificationController extends BaseController {
 
   private final int DEFAULT_PAGE_SIZE = 10;

@@ -2,9 +2,8 @@ package vincentlow.twittur.controller;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.response.api.ApiResponse;
@@ -13,8 +12,7 @@ import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.NotFoundException;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 
-@ControllerAdvice
-@RestController
+@RestControllerAdvice
 public class ExceptionController extends BaseController {
 
   @ExceptionHandler

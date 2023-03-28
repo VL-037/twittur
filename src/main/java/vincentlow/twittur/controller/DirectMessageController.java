@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.DirectMessage;
 import vincentlow.twittur.model.request.DirectMessageRequest;
 import vincentlow.twittur.model.response.DirectMessageResponse;
@@ -24,7 +25,7 @@ import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.service.DirectMessageService;
 
 @RestController
-@RequestMapping(value = "api/v1/direct-messages", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = ApiPath.DIRECT_MESSAGE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class DirectMessageController extends BaseController {
 
   private final int DEFAULT_PAGE_SIZE = 2; // will return DEFAULT_PAGE_SIZE*2 messages

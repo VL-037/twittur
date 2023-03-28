@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
@@ -31,7 +32,7 @@ import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.AccountService;
 
 @RestController
-@RequestMapping(value = "/api/v1/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = ApiPath.ACCOUNT, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController extends BaseController {
 
   @Autowired

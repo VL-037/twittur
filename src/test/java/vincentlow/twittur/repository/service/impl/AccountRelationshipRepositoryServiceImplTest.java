@@ -55,7 +55,7 @@ public class AccountRelationshipRepositoryServiceImplTest {
     accountRelationship = new AccountRelationship();
     accountRelationship.setId(ACCOUNT_RELATIONSHIP_ID);
     accountRelationship.setFollower(follower);
-    accountRelationship.setFollower(followed);
+    accountRelationship.setFollowed(followed);
 
     doNothing().when(cacheService)
         .deleteByPattern(CacheKey.FIND_ACCOUNT_FOLLOWERS_PATTERN);
@@ -87,7 +87,7 @@ public class AccountRelationshipRepositoryServiceImplTest {
   }
 
   @Test
-  void findByFollowerIdAndFollowedId() {
+  void findByFollowerIdAndFollowedId_follower() {
 
     AccountRelationship result =
         accountRelationshipRepositoryService.findByFollowerIdAndFollowedId(FOLLOWER_ID, FOLLOWED_ID);
@@ -95,7 +95,8 @@ public class AccountRelationshipRepositoryServiceImplTest {
     verify(accountRelationshipRepository).findByFollowerIdAndFollowedId(FOLLOWER_ID, FOLLOWED_ID);
 
     assertNotNull(result);
-    assertEquals(accountRelationship, result);
+    assertEquals(follower, result.getFollower());
+    assertEquals(followed, result.getFollowed());
   }
 
   @Test

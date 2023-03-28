@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
 import vincentlow.twittur.model.request.UpdateTweetRequest;
@@ -30,7 +31,7 @@ import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.TweetService;
 
 @RestController
-@RequestMapping(value = "/api/v1/accounts/@{username}/tweets", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = ApiPath.TWEET, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TweetController extends BaseController {
 
   @Autowired

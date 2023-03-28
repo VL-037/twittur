@@ -3,6 +3,7 @@ package vincentlow.twittur.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,6 +16,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -64,6 +66,12 @@ public class AccountServiceImplTest {
 
   private final int PAGE_SIZE = 10;
 
+  private final int TWEETS_COUNT = 0;
+
+  private final int FOLLOWERS_COUNT = 0;
+
+  private final int FOLLOWING_COUNT = 0;
+
   private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
 
   private final String ACCOUNT_RELATIONSHIP_ID = "ACCOUNT_RELATIONSHIP_ID";
@@ -108,10 +116,22 @@ public class AccountServiceImplTest {
 
     account = new Account();
     account.setId(ACCOUNT_ID);
+    account.setFirstName(FIRST_NAME);
+    account.setLastName(LAST_NAME);
+    account.setDateOfBirth(DATE_OF_BIRTH);
     account.setUsername(USERNAME);
+    account.setAccountName(ACCOUNT_NAME);
+    account.setBio(BIO);
     account.setEmailAddress(EMAIL_ADDRESS);
+    account.setPhoneNumber(PHONE_NUMBER);
     account.setSalt(salt);
     account.setPassword(BCrypt.hashpw(PASSWORD, salt));
+    account.setTweets(Collections.EMPTY_LIST);
+    account.setFollowers(Collections.EMPTY_LIST);
+    account.setFollowing(Collections.EMPTY_LIST);
+    account.setSentMessages(Collections.EMPTY_LIST);
+    account.setReceivedMessages(Collections.EMPTY_LIST);
+    account.setNotifications(Collections.EMPTY_LIST);
 
     accountList = new ArrayList<>();
     accountList.add(account);
@@ -212,7 +232,31 @@ public class AccountServiceImplTest {
     verify(accountRepositoryService).save(any(Account.class));
 
     assertNotNull(result);
+    assertEquals(FIRST_NAME, result.getFirstName());
+    assertEquals(LAST_NAME, result.getLastName());
+    assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
     assertEquals(USERNAME, result.getUsername());
+    assertEquals(ACCOUNT_NAME, result.getAccountName());
+    assertEquals(BIO, result.getBio());
+    assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+    assertEquals(PHONE_NUMBER, result.getPhoneNumber());
+    assertNotNull(result.getSalt());
+    assertNotNull(result.getPassword());
+    assertTrue(result.getTweets()
+        .isEmpty());
+    assertTrue(result.getFollowers()
+        .isEmpty());
+    assertTrue(result.getFollowing()
+        .isEmpty());
+    assertTrue(result.getSentMessages()
+        .isEmpty());
+    assertTrue(result.getReceivedMessages()
+        .isEmpty());
+    assertTrue(result.getNotifications()
+        .isEmpty());
+    assertEquals(TWEETS_COUNT, result.getTweetsCount());
+    assertEquals(FOLLOWERS_COUNT, result.getFollowersCount());
+    assertEquals(FOLLOWING_COUNT, result.getFollowingCount());
   }
 
   @Test
@@ -236,7 +280,23 @@ public class AccountServiceImplTest {
     verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
 
     assertNotNull(result);
+    assertEquals(FIRST_NAME, result.getFirstName());
+    assertEquals(LAST_NAME, result.getLastName());
+    assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
     assertEquals(USERNAME, result.getUsername());
+    assertEquals(ACCOUNT_NAME, result.getAccountName());
+    assertEquals(BIO, result.getBio());
+    assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+    assertEquals(PHONE_NUMBER, result.getPhoneNumber());
+    assertNotNull(result.getTweets());
+    assertNotNull(result.getFollowers());
+    assertNotNull(result.getFollowing());
+    assertNotNull(result.getSentMessages());
+    assertNotNull(result.getReceivedMessages());
+    assertNotNull(result.getNotifications());
+    assertEquals(TWEETS_COUNT, result.getTweetsCount());
+    assertEquals(FOLLOWERS_COUNT, result.getFollowersCount());
+    assertEquals(FOLLOWING_COUNT, result.getFollowingCount());
   }
 
   @Test
@@ -250,8 +310,23 @@ public class AccountServiceImplTest {
     verify(accountRepositoryService).save(any(Account.class));
 
     assertNotNull(result);
+    assertEquals(FIRST_NAME, result.getFirstName());
+    assertEquals(LAST_NAME, result.getLastName());
+    assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
     assertEquals(USERNAME, result.getUsername());
+    assertEquals(ACCOUNT_NAME, result.getAccountName());
     assertEquals(BIO, result.getBio());
+    assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+    assertEquals(PHONE_NUMBER, result.getPhoneNumber());
+    assertNotNull(result.getTweets());
+    assertNotNull(result.getFollowers());
+    assertNotNull(result.getFollowing());
+    assertNotNull(result.getSentMessages());
+    assertNotNull(result.getReceivedMessages());
+    assertNotNull(result.getNotifications());
+    assertEquals(TWEETS_COUNT, result.getTweetsCount());
+    assertEquals(FOLLOWERS_COUNT, result.getFollowersCount());
+    assertEquals(FOLLOWING_COUNT, result.getFollowingCount());
   }
 
   @Test

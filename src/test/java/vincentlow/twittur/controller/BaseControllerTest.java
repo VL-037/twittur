@@ -57,7 +57,10 @@ public class BaseControllerTest {
 
     accountPage = new PageImpl<>(accountList, PAGE_REQUEST, accountList.size());
 
-    pageMetaData = new PageMetaData(PAGE_NUMBER, PAGE_SIZE, accountPage.getTotalElements());
+    pageMetaData = new PageMetaData();
+    pageMetaData.setPageNumber(PAGE_NUMBER);
+    pageMetaData.setPageSize(PAGE_SIZE);
+    pageMetaData.setTotalRecords(accountPage.getTotalElements());
   }
 
   @AfterEach
