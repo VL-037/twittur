@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Tweet;
 import vincentlow.twittur.model.request.CreateTweetRequest;
@@ -30,6 +31,7 @@ import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.TweetService;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPath.TWEET, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TweetController extends BaseController {
@@ -53,6 +55,8 @@ public class TweetController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (RuntimeException e) {
+      log.error("#getAccountTweets ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
+          pageNumber, pageSize, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -67,6 +71,8 @@ public class TweetController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
+      log.error("#getAccountTweetById ERROR! with username: {}, tweetId: {}, and error: {}", username,
+          tweetId, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -81,6 +87,8 @@ public class TweetController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
+      log.error("#postTweet ERROR! with username: {}, request: {}, and error: {}", username,
+          request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -92,6 +100,7 @@ public class TweetController extends BaseController {
       tweetService.initDummyTweets(username);
       return successResponse;
     } catch (RuntimeException e) {
+      log.error("#initDummyTweets ERROR! with username: {}, and error: {}", username, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -107,6 +116,8 @@ public class TweetController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
+      log.error("#updateAccountTweet ERROR! with username: {}, tweetId: {}, request: {}, and error: {}", username,
+          tweetId, request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -118,6 +129,8 @@ public class TweetController extends BaseController {
       tweetService.deleteAccountTweet(username, tweetId);
       return successResponse;
     } catch (RuntimeException e) {
+      log.error("#deleteAccountTweet ERROR! with username: {}, tweetId: {}, and error: {}", username,
+          tweetId, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

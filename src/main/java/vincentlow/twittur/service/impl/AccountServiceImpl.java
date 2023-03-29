@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.entity.Account;
@@ -41,6 +42,7 @@ import vincentlow.twittur.repository.service.AccountRepositoryService;
 import vincentlow.twittur.service.AccountService;
 import vincentlow.twittur.utils.StringUtil;
 
+@Slf4j
 @Service
 public class AccountServiceImpl implements AccountService {
 
@@ -163,6 +165,7 @@ public class AccountServiceImpl implements AccountService {
           .collect(Collectors.toList());
       accountRepositoryService.saveAll(accounts);
     } catch (IOException e) {
+      log.error("#initDummyAccounts ERROR! with accountJson: {}, and error: {}", accountJson, e.getMessage(), e);
       throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
     }
   }

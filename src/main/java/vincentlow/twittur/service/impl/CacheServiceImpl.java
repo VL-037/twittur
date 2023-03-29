@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.service.CacheService;
 
+@Slf4j
 @Service
 public class CacheServiceImpl implements CacheService {
 
@@ -37,6 +39,8 @@ public class CacheServiceImpl implements CacheService {
         return objectMapper.readValue(cacheData, typeRef);
       }
     } catch (Exception e) {
+      log.error("#CacheServiceImpl#get ERROR! with key: {}, typeRef: {} and error: {}", key, typeRef, e.getMessage(),
+          e);
     }
     return null;
   }
@@ -51,6 +55,8 @@ public class CacheServiceImpl implements CacheService {
             .set(key, valueString, getTTL(ttl), TimeUnit.SECONDS);
       }
     } catch (Exception e) {
+      log.error("#CacheServiceImpl#set ERROR! with key: {}, data: {}, ttl: {} and error: {}", key, data, ttl,
+          e.getMessage(), e);
     }
   }
 
@@ -61,6 +67,7 @@ public class CacheServiceImpl implements CacheService {
       Set<String> keys = stringRedisTemplate.keys(pattern);
       stringRedisTemplate.delete(keys);
     } catch (Exception e) {
+      log.error("#CacheServiceImpl#deleteByPattern ERROR! with pattern: {}, and error: {}", pattern, e.getMessage(), e);
     }
   }
 

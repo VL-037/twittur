@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
@@ -31,6 +32,7 @@ import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.AccountService;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPath.ACCOUNT, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AccountController extends BaseController {
@@ -48,6 +50,7 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (Exception e) {
+      log.error("#createAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -68,6 +71,8 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (Exception e) {
+      log.error("#getAccounts ERROR! with pageNumber: {}, pageSize: {}, and error: {}", pageNumber, pageSize,
+          e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -81,6 +86,7 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
+      log.error("#getAccountByUsername ERROR! with username: {}, and error: {}", username, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -95,6 +101,8 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
+      log.error("#updateAccount ERROR! with username: {}, request: {}, and error: {}", username, request,
+          e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -106,6 +114,7 @@ public class AccountController extends BaseController {
       accountService.initDummyAccounts();
       return successResponse;
     } catch (RuntimeException e) {
+      log.error("#initDummyAccounts ERROR! with error: {}", e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -117,6 +126,7 @@ public class AccountController extends BaseController {
       accountService.follow(request);
       return successResponse;
     } catch (RuntimeException e) {
+      log.error("#followAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -128,6 +138,7 @@ public class AccountController extends BaseController {
       accountService.unfollow(request);
       return successResponse;
     } catch (RuntimeException e) {
+      log.error("#unfollowAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -148,6 +159,9 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (RuntimeException e) {
+      log.error("#getAccountFollowers ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}",
+          pageNumber,
+          pageSize, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -168,6 +182,8 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (RuntimeException e) {
+      log.error("#getAccountFollowing ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
+          pageNumber, pageSize, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

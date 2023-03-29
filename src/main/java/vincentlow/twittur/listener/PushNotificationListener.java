@@ -11,12 +11,14 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.KafkaConstant;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.Notification;
 import vincentlow.twittur.repository.NotificationRepository;
 import vincentlow.twittur.repository.service.AccountRepositoryService;
 
+@Slf4j
 @Component
 public class PushNotificationListener {
 
@@ -52,6 +54,7 @@ public class PushNotificationListener {
       }
 
     } catch (Exception e) {
+      log.error("#processPushNotification ERROR! with record: {}, and error: {}", record, e.getMessage(), e);
     }
   }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Notification;
 import vincentlow.twittur.model.request.GetNotificationRequest;
@@ -23,6 +24,7 @@ import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.NotificationService;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPath.NOTIFICATION, produces = MediaType.APPLICATION_JSON_VALUE)
 public class NotificationController extends BaseController {
@@ -49,6 +51,8 @@ public class NotificationController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (Exception e) {
+      log.error("#getNotifications ERROR! with request: {}, pageNumber: {}, and error: {}", request, pageNumber,
+          e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

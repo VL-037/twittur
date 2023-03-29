@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.constant.NotificationType;
@@ -36,6 +37,7 @@ import vincentlow.twittur.repository.TweetRepository;
 import vincentlow.twittur.service.KafkaPublisherService;
 import vincentlow.twittur.service.TweetService;
 
+@Slf4j
 @Service
 public class TweetServiceImpl implements TweetService {
 
@@ -119,13 +121,13 @@ public class TweetServiceImpl implements TweetService {
   public void initDummyTweets(String username) {
 
     ObjectMapper mapper = new ObjectMapper();
-    ClassPathResource requestJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
+    ClassPathResource tweetJson = new ClassPathResource(DUMMY_REQUESTS_PATH);
 
     Account account = accountRepository.findByUsernameAndMarkForDeleteFalse(username);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     try {
-      List<CreateTweetRequest> requests = mapper.readValue(requestJson.getInputStream(), new TypeReference<>() {});
+      List<CreateTweetRequest> requests = mapper.readValue(tweetJson.getInputStream(), new TypeReference<>() {});
       List<Tweet> tweets = requests.stream()
           .map(request -> convertToTweet(request))
           .collect(Collectors.toList());
@@ -143,6 +145,8 @@ public class TweetServiceImpl implements TweetService {
       account.setTweetsCount(account.getTweetsCount() + saved.size());
       accountRepository.save(account);
     } catch (IOException e) {
+      log.error("#initDummyTweets ERROR! with username: {}, tweetJson: {}, and error: {}", username, tweetJson,
+          e.getMessage(), e);
       throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
     }
   }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.DirectMessage;
 import vincentlow.twittur.model.request.DirectMessageRequest;
@@ -24,6 +25,7 @@ import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.service.DirectMessageService;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPath.DIRECT_MESSAGE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class DirectMessageController extends BaseController {
@@ -43,6 +45,8 @@ public class DirectMessageController extends BaseController {
 
       return toSuccessApiResponse(response);
     } catch (Exception e) {
+      log.error("#sendDirectMessage ERROR! with senderId: {}, recipientId: {}, request: {}, and error: {}", senderId,
+          recipientId, request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }
@@ -63,6 +67,8 @@ public class DirectMessageController extends BaseController {
 
       return toSuccessApiResponse(response, null);
     } catch (Exception e) {
+      log.error("#getDirectMessages ERROR! with senderId: {}, recipientId: {}, pageNumber: {}, and error: {}", senderId,
+          recipientId, pageNumber, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

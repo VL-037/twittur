@@ -4,9 +4,11 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 
+@Slf4j
 public class StringUtil {
 
   public static void trimStrings(Object object) {
@@ -26,6 +28,7 @@ public class StringUtil {
               field.set(object, trimmedFieldValue);
             }
           } catch (IllegalAccessException e) {
+            log.error("#trimStrings ERROR! with object: {}, and error: {}", object, e.getMessage(), e);
             throw new ServiceUnavailableException(ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
           }
         });
