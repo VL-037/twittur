@@ -19,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -42,6 +44,12 @@ public class CacheServiceImplTest {
   private CacheServiceImpl cacheService;
 
   @Mock
+  private RedisConnectionFactory redisConnectionFactory;
+
+  @Mock
+  private RedisConnection redisConnection;
+
+  @Mock
   private StringRedisTemplate stringRedisTemplate;
 
   @Mock
@@ -63,10 +71,15 @@ public class CacheServiceImplTest {
     keys = new HashSet<>();
 
     valueOperations = mock(ValueOperations.class);
+
+    when(stringRedisTemplate.getConnectionFactory()).thenReturn(redisConnectionFactory);
+    when(redisConnectionFactory.getConnection()).thenReturn(redisConnection);
     when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
     when(valueOperations.get(KEY)).thenReturn(CACHE_DATA);
     when(objectMapper.readValue(eq(CACHE_DATA), any(TypeReference.class))).thenReturn(account);
 
+    doNothing().when(redisConnection)
+        .flushDb();
     when(objectMapper.writeValueAsString(account)).thenReturn(CACHE_DATA);
     doNothing().when(valueOperations)
         .set(KEY, CACHE_DATA, TTL, TimeUnit.SECONDS);
@@ -76,7 +89,18 @@ public class CacheServiceImplTest {
   @AfterEach
   void tearDown() {
 
-    verifyNoMoreInteractions(stringRedisTemplate, objectMapper);
+    verifyNoMoreInteractions(redisConnectionFactory, redisConnection, stringRedisTemplate, objectMapper);
+  }
+
+  @Test
+  void flushAll() {
+
+    cacheService.flushAll();
+
+    verify(stringRedisTemplate).getConnectionFactory();
+    verify(redisConnectionFactory).getConnection();
+    verify(redisConnection).flushDb();
+    verify(redisConnection).close();
   }
 
   @Test

@@ -1,0 +1,21 @@
+{
+  "id": "b71943fc-37cd-4e57-915c-ee9d07512355",
+  "createdBy": "system",
+  "createdDate": "2023-03-29T14:21:46.574949",
+  "updatedBy": "system",
+  "updatedDate": "2023-03-29T14:21:46.574949",
+  "markForDelete": false,
+  "firstName": "John",
+  "lastName": "Doe",
+  "dateOfBirth": "1995-05-23",
+  "username": "johndoe123",
+  "accountName": "John's Account",
+  "bio": "I'm a web developer",
+  "emailAddress": "johndoe123@gmail.com",
+  "phoneNumber": "+15417543010",
+  "salt": "$2a$10$C6Xexv19.OYVrt0mAVf5Te",
+  "password": "$2a$10$C6Xexv19.OYVrt0mAVf5TeFWNxWpM7tt9rVI4/yeNDOdXUCudP3qS",
+  "tweetsCount": 0,
+  "followersCount": 0,
+  "followingCount": 0
+}

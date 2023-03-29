@@ -14,14 +14,14 @@ public class BaseController {
 
   protected ApiResponse successResponse = new ApiResponse(HttpStatus.OK, null);
 
-  protected <T> ApiListResponse toSuccessApiResponse(List<T> content, PageMetaData pageMetaData) {
-
-    return new ApiListResponse(HttpStatus.OK, null, content, pageMetaData);
-  }
-
   protected <T> ApiSingleResponse toSuccessApiResponse(T data) {
 
     return new ApiSingleResponse(HttpStatus.OK, null, data);
+  }
+
+  protected <T> ApiListResponse toSuccessApiResponse(List<T> content, PageMetaData pageMetaData) {
+
+    return new ApiListResponse(HttpStatus.OK, null, content, pageMetaData);
   }
 
   protected ApiResponse toErrorApiResponse(HttpStatus httpStatus, String error) {

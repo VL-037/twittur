@@ -1,0 +1,21 @@
+{
+  "id" : "ffbd00a9-7aeb-4b8c-b211-da65ee65c2f9",
+  "createdBy" : "system",
+  "createdDate" : "2023-03-29T14:21:46.968003",
+  "updatedBy" : "system",
+  "updatedDate" : "2023-03-29T14:21:46.968003",
+  "markForDelete" : false,
+  "firstName" : "Emily",
+  "lastName" : "Davis",
+  "dateOfBirth" : "1998-12-28",
+  "username" : "emilydavis321",
+  "accountName" : "Emily's Account",
+  "bio" : "I'm a photographer",
+  "emailAddress" : "emilydavis321@gmail.com",
+  "phoneNumber" : "+13035551212",
+  "salt" : "$2a$10$W5cp.z/53Jbb6A.lhyXBQO",
+  "password" : "$2a$10$W5cp.z/53Jbb6A.lhyXBQO/1FkhEaPTz389fVUu.jI8FiIZNsMtd6",
+  "tweetsCount" : 0,
+  "followersCount" : 0,
+  "followingCount" : 0
+}

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,15 @@ public class CacheServiceImpl implements CacheService {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Override
+  public void flushAll() {
+
+    RedisConnection redisConnection = stringRedisTemplate.getConnectionFactory()
+        .getConnection();
+    redisConnection.flushDb();
+    redisConnection.close();
+  }
 
   @Override
   public <T> T get(String key, TypeReference<T> typeRef) {

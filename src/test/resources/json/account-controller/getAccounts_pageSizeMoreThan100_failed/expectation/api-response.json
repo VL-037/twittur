@@ -1,0 +1,5 @@
+{
+  "code": 400,
+  "status": "BAD_REQUEST",
+  "error": "page size must be between 1 and 100"
+}

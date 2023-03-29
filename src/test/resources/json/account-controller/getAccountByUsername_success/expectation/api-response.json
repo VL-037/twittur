@@ -1,0 +1,17 @@
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "id": "b71943fc-37cd-4e57-915c-ee9d07512355",
+    "createdDate": "2023-03-29T14:21:46.574949",
+    "createdBy": "system",
+    "updatedDate": "2023-03-29T14:21:46.574949",
+    "updatedBy": "system",
+    "username": "johndoe123",
+    "accountName": "John's Account",
+    "bio": "I'm a web developer",
+    "tweetsCount": 0,
+    "followersCount": 0,
+    "followingCount": 0
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "code": 400,
+  "status": "BAD_REQUEST",
+  "error": "page number must be at least 0"
+}
