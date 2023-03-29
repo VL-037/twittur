@@ -23,6 +23,9 @@ import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.AccountFollowerResponse;
 import vincentlow.twittur.model.response.AccountResponse;
@@ -92,16 +95,56 @@ public class AccountController extends BaseController {
   }
 
   @PutMapping("/@{username}")
-  public ApiSingleResponse<AccountResponse> updateAccount(@PathVariable("username") String username,
+  public ApiResponse updateAccount(@PathVariable("username") String username,
       @RequestBody UpdateAccountRequest request) {
 
     try {
-      Account account = accountService.updateAccountByUsername(username, request);
-      AccountResponse response = toResponse(account, AccountResponse.class);
-
-      return toSuccessApiResponse(response);
+      accountService.updateAccountByUsername(username, request);
+      return successResponse;
     } catch (RuntimeException e) {
       log.error("#updateAccount ERROR! with username: {}, request: {}, and error: {}", username, request,
+          e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PutMapping("/@{username}/emailAddress")
+  public ApiResponse updateAccountEmail(@PathVariable("username") String username,
+      @RequestBody UpdateAccountEmailRequest request) {
+
+    try {
+      accountService.updateAccountEmailAddressByUsername(username, request);
+      return successResponse;
+    } catch (RuntimeException e) {
+      log.error("#updateAccountEmail ERROR! with username: {}, request: {}, and error: {}", username, request,
+          e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PutMapping("/@{username}/phoneNumber")
+  public ApiResponse updateAccountPhoneNumber(@PathVariable("username") String username,
+      @RequestBody UpdateAccountPhoneNumberRequest request) {
+
+    try {
+      accountService.updateAccountPhoneNumberByUsername(username, request);
+      return successResponse;
+    } catch (RuntimeException e) {
+      log.error("#updateAccountPhoneNumber ERROR! with username: {}, request: {}, and error: {}", username, request,
+          e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PutMapping("/@{username}/password")
+  public ApiResponse updateAccountPassword(@PathVariable("username") String username,
+      @RequestBody UpdateAccountPasswordRequest request) {
+
+    try {
+      accountService.updateAccountPasswordByUsername(username, request);
+      return successResponse;
+    } catch (RuntimeException e) {
+      log.error("#updateAccountPassword ERROR! with username: {}, request: {}, and error: {}", username, request,
           e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }

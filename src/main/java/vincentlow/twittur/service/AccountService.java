@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 
 public interface AccountService {
@@ -15,7 +18,13 @@ public interface AccountService {
 
   Account findAccountByUsername(String username);
 
-  Account updateAccountByUsername(String username, UpdateAccountRequest request);
+  void updateAccountByUsername(String username, UpdateAccountRequest request);
+
+  void updateAccountEmailAddressByUsername(String username, UpdateAccountEmailRequest request);
+
+  void updateAccountPhoneNumberByUsername(String username, UpdateAccountPhoneNumberRequest request);
+
+  void updateAccountPasswordByUsername(String username, UpdateAccountPasswordRequest request);
 
   void initDummyAccounts();
 

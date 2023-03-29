@@ -35,6 +35,9 @@ import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.AccountRelationship;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.repository.service.AccountRelationshipRepositoryService;
 import vincentlow.twittur.repository.service.AccountRepositoryService;
@@ -58,9 +61,17 @@ public class AccountServiceImplTest {
 
   private final String EMAIL_ADDRESS = "EMAIL_ADDRESS";
 
+  private final String NEW_EMAIL_ADDRESS = "NEW_EMAIL_ADDRESS";
+
   private final String PHONE_NUMBER = "+621234567890";
 
+  private final String NEW_PHONE_NUMBER = "+620987654321";
+
   private final String PASSWORD = "PASSWORD_PASSWORD";
+
+  private final String NEW_PASSWORD = "NEW_PASSWORD_PASSWORD";
+
+  private final String CONFIRM_NEW_PASSWORD = NEW_PASSWORD;
 
   private final int PAGE_NUMBER = 0;
 
@@ -98,6 +109,12 @@ public class AccountServiceImplTest {
   private CreateAccountRequest createAccountRequest;
 
   private UpdateAccountRequest updateAccountRequest;
+
+  private UpdateAccountEmailRequest updateAccountEmailRequest;
+
+  private UpdateAccountPhoneNumberRequest updateAccountPhoneNumberRequest;
+
+  private UpdateAccountPasswordRequest updateAccountPasswordRequest;
 
   private AccountRelationship accountRelationship;
 
@@ -153,12 +170,21 @@ public class AccountServiceImplTest {
     updateAccountRequest = UpdateAccountRequest.builder()
         .username(USERNAME)
         .accountName(ACCOUNT_NAME)
-        .emailAddress(EMAIL_ADDRESS)
-        .phoneNumber(PHONE_NUMBER)
         .bio(BIO)
+        .build();
+
+    updateAccountEmailRequest = UpdateAccountEmailRequest.builder()
+        .emailAddress(NEW_EMAIL_ADDRESS)
+        .build();
+
+    updateAccountPhoneNumberRequest = UpdateAccountPhoneNumberRequest.builder()
+        .phoneNumber(PHONE_NUMBER)
+        .build();
+
+    updateAccountPasswordRequest = UpdateAccountPasswordRequest.builder()
         .oldPassword(PASSWORD)
-        .newPassword(PASSWORD)
-        .confirmNewPassword(PASSWORD)
+        .newPassword(NEW_PASSWORD)
+        .confirmNewPassword(CONFIRM_NEW_PASSWORD)
         .build();
 
     Account follower = new Account();
@@ -273,8 +299,6 @@ public class AccountServiceImplTest {
   @Test
   void findAccountByUsername() {
 
-    when(accountRepositoryService.findByUsernameAndMarkForDeleteFalse(USERNAME)).thenReturn(account);
-
     Account result = accountService.findAccountByUsername(USERNAME);
 
     verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
@@ -302,31 +326,40 @@ public class AccountServiceImplTest {
   @Test
   void updateAccountByUsername() {
 
-    when(accountRepositoryService.findByUsernameAndMarkForDeleteFalse(USERNAME)).thenReturn(account);
-
-    Account result = accountService.updateAccountByUsername(USERNAME, updateAccountRequest);
+    accountService.updateAccountByUsername(USERNAME, updateAccountRequest);
 
     verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
     verify(accountRepositoryService).save(any(Account.class));
+  }
 
-    assertNotNull(result);
-    assertEquals(FIRST_NAME, result.getFirstName());
-    assertEquals(LAST_NAME, result.getLastName());
-    assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
-    assertEquals(USERNAME, result.getUsername());
-    assertEquals(ACCOUNT_NAME, result.getAccountName());
-    assertEquals(BIO, result.getBio());
-    assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
-    assertEquals(PHONE_NUMBER, result.getPhoneNumber());
-    assertNotNull(result.getTweets());
-    assertNotNull(result.getFollowers());
-    assertNotNull(result.getFollowing());
-    assertNotNull(result.getSentMessages());
-    assertNotNull(result.getReceivedMessages());
-    assertNotNull(result.getNotifications());
-    assertEquals(TWEETS_COUNT, result.getTweetsCount());
-    assertEquals(FOLLOWERS_COUNT, result.getFollowersCount());
-    assertEquals(FOLLOWING_COUNT, result.getFollowingCount());
+  @Test
+  void updateAccountEmailAddressByUsername() {
+
+    when(accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(anyString())).thenReturn(null);
+
+    accountService.updateAccountEmailAddressByUsername(USERNAME, updateAccountEmailRequest);
+
+    verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
+    verify(accountRepositoryService).findByEmailAddressAndMarkForDeleteFalse(anyString());
+    verify(accountRepositoryService).save(any(Account.class));
+  }
+
+  @Test
+  void updateAccountPhoneNumberByUsername() {
+
+    accountService.updateAccountPhoneNumberByUsername(USERNAME, updateAccountPhoneNumberRequest);
+
+    verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
+    verify(accountRepositoryService).save(any(Account.class));
+  }
+
+  @Test
+  void updateAccountPasswordByUsername() {
+
+    accountService.updateAccountPasswordByUsername(USERNAME, updateAccountPasswordRequest);
+
+    verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
+    verify(accountRepositoryService).save(any(Account.class));
   }
 
   @Test

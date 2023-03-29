@@ -11,13 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateAccountRequest implements Serializable {
+public class UpdateAccountPhoneNumberRequest implements Serializable {
 
   private static final long serialVersionUID = 1742974303828086822L;
 
-  private String username;
-
-  private String accountName;
-
-  private String bio;
+  private String phoneNumber;
 }
