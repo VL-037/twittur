@@ -34,6 +34,9 @@ import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.AccountRelationship;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
@@ -108,30 +111,97 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Account updateAccountByUsername(String username, UpdateAccountRequest request) {
+  public void updateAccountByUsername(String username, UpdateAccountRequest request) {
 
     Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
     validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
 
     StringUtil.trimStrings(request);
-    validateRequest(request);
 
-    if (!request.getUsername()
-        .equals(account.getUsername())) {
-      Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(account.getUsername());
-      if (Objects.nonNull(existingAccount)) {
-        throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
-      }
-    }
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
+    validateArgument(StringUtils.isNotBlank(request.getUsername()), ErrorCode.USERNAME_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(request.getUsername()
+        .length() >= 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
+    validateArgument(request.getUsername()
+        .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
+    validateArgument(validateBioLength(request.getBio()), ErrorCode.BIO_MAXIMAL_LENGTH_IS_100.getMessage());
+
+    BeanUtils.copyProperties(request, account);
+    account.setUpdatedBy(account.getId());
+    account.setUpdatedDate(LocalDateTime.now());
+
+    accountRepositoryService.save(account);
+  }
+
+  @Override
+  public void updateAccountEmailAddressByUsername(String username, UpdateAccountEmailRequest request) {
+
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    StringUtil.trimStrings(request);
+
+    validateArgument(StringUtils.isNotBlank(request.getEmailAddress()),
+        ErrorCode.EMAIL_ADDRESS_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(request.getEmailAddress()
+        .length() <= 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
 
     if (!request.getEmailAddress()
         .equals(account.getEmailAddress())) {
       Account existingAccount =
           accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(account.getEmailAddress());
+
       if (Objects.nonNull(existingAccount)) {
         throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
       }
+
+      account.setEmailAddress(request.getEmailAddress());
+      account.setUpdatedBy(account.getId());
+      account.setUpdatedDate(LocalDateTime.now());
+
+      accountRepositoryService.save(account);
     }
+  }
+
+  @Override
+  public void updateAccountPhoneNumberByUsername(String username, UpdateAccountPhoneNumberRequest request) {
+
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    StringUtil.trimStrings(request);
+
+    if (StringUtils.isNotBlank(request.getPhoneNumber())) {
+      validateArgument(isPhoneNumberValid(request.getPhoneNumber()), ErrorCode.PHONE_NUMBER_IS_NOT_VALID.getMessage());
+    } else {
+      request.setPhoneNumber(null);
+    }
+
+    account.setPhoneNumber(request.getPhoneNumber());
+    account.setUpdatedBy(account.getId());
+    account.setUpdatedDate(LocalDateTime.now());
+
+    accountRepositoryService.save(account);
+  }
+
+  @Override
+  public void updateAccountPasswordByUsername(String username, UpdateAccountPasswordRequest request) {
+
+    Account account = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(username);
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    StringUtil.trimStrings(request);
+
+    validateState(StringUtils.isNotBlank(request.getOldPassword()),
+        ErrorCode.OLD_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
+    validateState(StringUtils.isNotBlank(request.getNewPassword()),
+        ErrorCode.NEW_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(request.getNewPassword()
+        .length() >= 10, ErrorCode.PASSWORD_MINIMAL_LENGTH_IS_10.getMessage());
+    validateState(StringUtils.isNotBlank(request.getConfirmNewPassword()),
+        ErrorCode.CONFIRM_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
+    validateArgument(request.getNewPassword()
+        .equals(request.getConfirmNewPassword()), ErrorCode.CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD.getMessage());
 
     String oldSalt = account.getSalt();
     String oldHashedPassword = account.getPassword();
@@ -142,13 +212,12 @@ public class AccountServiceImpl implements AccountService {
     String newSalt = BCrypt.gensalt();
     String newHashedPassword = BCrypt.hashpw(request.getNewPassword(), newSalt);
 
-    BeanUtils.copyProperties(request, account);
     account.setSalt(newSalt);
     account.setPassword(newHashedPassword);
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
-    return accountRepositoryService.save(account);
+    accountRepositoryService.save(account);
   }
 
   @Override
@@ -285,38 +354,6 @@ public class AccountServiceImpl implements AccountService {
         ErrorCode.CONFIRM_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(request.getPassword()
         .equals(request.getConfirmPassword()), ErrorCode.CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD.getMessage());
-  }
-
-  private void validateRequest(UpdateAccountRequest request) {
-
-    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getUsername()), ErrorCode.USERNAME_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getUsername()
-        .length() >= 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
-    validateArgument(request.getUsername()
-        .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
-    validateArgument(validateBioLength(request.getBio()), ErrorCode.BIO_MAXIMAL_LENGTH_IS_100.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getEmailAddress()),
-        ErrorCode.EMAIL_ADDRESS_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getEmailAddress()
-        .length() <= 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
-
-    if (StringUtils.isNotBlank(request.getPhoneNumber())) {
-      validateArgument(isPhoneNumberValid(request.getPhoneNumber()), ErrorCode.PHONE_NUMBER_IS_NOT_VALID.getMessage());
-    } else {
-      request.setPhoneNumber(null);
-    }
-
-    validateState(StringUtils.isNotBlank(request.getOldPassword()),
-        ErrorCode.OLD_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
-    validateState(StringUtils.isNotBlank(request.getNewPassword()),
-        ErrorCode.NEW_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getNewPassword()
-        .length() >= 10, ErrorCode.PASSWORD_MINIMAL_LENGTH_IS_10.getMessage());
-    validateState(StringUtils.isNotBlank(request.getConfirmNewPassword()),
-        ErrorCode.CONFIRM_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getNewPassword()
-        .equals(request.getConfirmNewPassword()), ErrorCode.CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD.getMessage());
   }
 
   private boolean isPhoneNumberValid(String phoneNumber) {

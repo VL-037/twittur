@@ -40,6 +40,9 @@ import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.service.AccountService;
 
@@ -93,6 +96,12 @@ public class AccountControllerTest {
 
   private UpdateAccountRequest updateAccountRequest;
 
+  private UpdateAccountEmailRequest updateAccountEmailRequest;
+
+  private UpdateAccountPhoneNumberRequest updateAccountPhoneNumberRequest;
+
+  private UpdateAccountPasswordRequest updateAccountPasswordRequest;
+
   private AccountRelationshipRequest accountRelationshipRequest;
 
   @BeforeEach
@@ -121,6 +130,15 @@ public class AccountControllerTest {
     updateAccountRequest = UpdateAccountRequest.builder()
         .build();
 
+    updateAccountEmailRequest = UpdateAccountEmailRequest.builder()
+        .build();
+
+    updateAccountPhoneNumberRequest = UpdateAccountPhoneNumberRequest.builder()
+        .build();
+
+    updateAccountPasswordRequest = UpdateAccountPasswordRequest.builder()
+        .build();
+
     accountRelationshipRequest = AccountRelationshipRequest.builder()
         .followerId(FOLLOWER_ID)
         .followedId(FOLLOWED_ID)
@@ -138,7 +156,14 @@ public class AccountControllerTest {
     when(accountService.createAccount(any(CreateAccountRequest.class))).thenReturn(account);
     when(accountService.findAccounts(PAGE_NUMBER, PAGE_SIZE)).thenReturn(accountPage);
     when(accountService.findAccountByUsername(USERNAME)).thenReturn(account);
-    when(accountService.updateAccountByUsername(eq(USERNAME), any(UpdateAccountRequest.class))).thenReturn(account);
+    doNothing().when(accountService)
+        .updateAccountByUsername(eq(USERNAME), any(UpdateAccountRequest.class));
+    doNothing().when(accountService)
+        .updateAccountEmailAddressByUsername(eq(USERNAME), any(UpdateAccountEmailRequest.class));
+    doNothing().when(accountService)
+        .updateAccountPhoneNumberByUsername(eq(USERNAME), any(UpdateAccountPhoneNumberRequest.class));
+    doNothing().when(accountService)
+        .updateAccountPasswordByUsername(eq(USERNAME), any(UpdateAccountPasswordRequest.class));
     doNothing().when(accountService)
         .follow(any(AccountRelationshipRequest.class));
     doNothing().when(accountService)
@@ -221,15 +246,53 @@ public class AccountControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
         .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
-        .andExpect(jsonPath("$.data.username", equalTo(USERNAME)))
-        .andExpect(jsonPath("$.data.accountName", equalTo(ACCOUNT_NAME)))
-        .andExpect(jsonPath("$.data.bio", equalTo(BIO)))
-        .andExpect(jsonPath("$.data.tweetsCount", equalTo(TWEETS_COUNT)))
-        .andExpect(jsonPath("$.data.followersCount", equalTo(FOLLOWERS_COUNT)))
-        .andExpect(jsonPath("$.data.followingCount", equalTo(FOLLOWING_COUNT)))
         .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(accountService).updateAccountByUsername(USERNAME, updateAccountRequest);
+  }
+
+  @Test
+  void updateAccount_emailAddress() throws Exception {
+
+    this.mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + USERNAME + "/emailAddress").accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateAccountEmailRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.error", equalTo(null)));
+
+    verify(accountService).updateAccountEmailAddressByUsername(USERNAME, updateAccountEmailRequest);
+  }
+
+  @Test
+  void updateAccount_phoneNumber() throws Exception {
+
+    this.mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + USERNAME + "/phoneNumber").accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateAccountPhoneNumberRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.error", equalTo(null)));
+
+    verify(accountService).updateAccountPhoneNumberByUsername(USERNAME, updateAccountPhoneNumberRequest);
+  }
+
+  @Test
+  void updateAccount_password() throws Exception {
+
+    this.mockMvc.perform(put(ApiPath.ACCOUNT + "/@" + USERNAME + "/password").accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(updateAccountPasswordRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.error", equalTo(null)));
+
+    verify(accountService).updateAccountPasswordByUsername(USERNAME, updateAccountPasswordRequest);
   }
 
   @Test
