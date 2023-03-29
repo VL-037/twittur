@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,13 @@ import vincentlow.twittur.integration.BaseIntegrationTest;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.CreateAccountRequest;
+import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
+import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
+import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
+import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.model.response.AccountResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
+import vincentlow.twittur.model.response.api.ApiResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.service.CacheService;
@@ -33,6 +39,14 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
   private final String ACCOUNT_CONTROLLER_DIR = "account-controller";
 
   private final String CREATE_ACCOUNT_REQUEST_JSON = "create-account-request";
+
+  private final String UPDATE_ACCOUNT_REQUEST_JSON = "update-account-request";
+
+  private final String UPDATE_ACCOUNT_EMAIL_REQUEST_JSON = "update-account-email-request";
+
+  private final String UPDATE_ACCOUNT_PHONE_NUMBER_REQUEST_JSON = "update-account-phone-number-request";
+
+  private final String UPDATE_ACCOUNT_PASSWORD_REQUEST_JSON = "update-account-password-request";
 
   private final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
 
@@ -307,12 +321,10 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void getAccountByUsername_notFound_failed() throws Exception {
+  public void getAccountByUsername_accountNotFound_failed() throws Exception {
 
     ApiSingleResponse<AccountResponse> expectation =
         getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
-
-    accountRepository.save(account1);
 
     MvcResult result = mockMvc
         .perform(get(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME).accept(MediaType.APPLICATION_JSON_VALUE)
@@ -322,6 +334,262 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
     ApiSingleResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
 
     baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccount_success() throws Exception {
+
+    UpdateAccountRequest updateAccountRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername()).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccount_accountNotFound_failed() throws Exception {
+
+    UpdateAccountRequest updateAccountRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccount_usernameIsTaken_failed() throws Exception {
+
+    UpdateAccountRequest updateAccountRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+    accountRepository.save(account2);
+
+    updateAccountRequest.setUsername(account2.getUsername());
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername()).accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountEmail_success() throws Exception {
+
+    UpdateAccountEmailRequest updateAccountEmailRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_EMAIL_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername() + "/emailAddress")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountEmailRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountEmail_accountNotFound_failed() throws Exception {
+
+    UpdateAccountEmailRequest updateAccountEmailRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_EMAIL_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/emailAddress")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountEmailRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountEmail_emailAddressIsTaken_failed() throws Exception {
+
+    UpdateAccountEmailRequest updateAccountEmailRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_EMAIL_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+    accountRepository.save(account2);
+
+    updateAccountEmailRequest.setEmailAddress(account2.getEmailAddress());
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername() + "/emailAddress")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountEmailRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountPhoneNumber_success() throws Exception {
+
+    UpdateAccountPhoneNumberRequest updateAccountPhoneNumberRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_PHONE_NUMBER_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername() + "/phoneNumber")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountPhoneNumberRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountPhoneNumber_blankPhoneNumber_success() throws Exception {
+
+    UpdateAccountPhoneNumberRequest updateAccountPhoneNumberRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_PHONE_NUMBER_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+
+    updateAccountPhoneNumberRequest.setPhoneNumber("");
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + account1.getUsername() + "/phoneNumber")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountPhoneNumberRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountPhoneNumber_accountNotFound_failed() throws Exception {
+
+    UpdateAccountPhoneNumberRequest updateAccountPhoneNumberRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_PHONE_NUMBER_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/phoneNumber")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountPhoneNumberRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountPassword_success() throws Exception {
+
+    CreateAccountRequest createAccountRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, CREATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+
+    mockMvc.perform(post(ApiPath.ACCOUNT).accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectToContentString(createAccountRequest)))
+        .andReturn();
+
+    UpdateAccountPasswordRequest updateAccountPasswordRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_PASSWORD_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + createAccountRequest.getUsername() + "/password")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountPasswordRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void updateAccountPassword_accountNotFound_failed() throws Exception {
+
+    UpdateAccountPasswordRequest updateAccountPasswordRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, UPDATE_ACCOUNT_PASSWORD_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc
+        .perform(put(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/password")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(updateAccountPasswordRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
