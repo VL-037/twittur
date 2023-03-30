@@ -46,6 +46,10 @@ import vincentlow.twittur.model.response.api.ApiSingleResponse;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BaseIntegrationTest {
 
+  protected final String ACCOUNT_ENTITY_DIR = "account";
+
+  protected final String ACCOUNT_RELATIONSHIP_ENTITY_DIR = "account-relationship";
+
   protected final int PAGE_NUMBER = 0;
 
   protected final int PAGE_SIZE = 10;
@@ -71,11 +75,6 @@ public class BaseIntegrationTest {
     params = new HashMap<>();
     params.put("pageNumber", String.valueOf(PAGE_NUMBER));
     params.put("pageSize", String.valueOf(PAGE_SIZE));
-
-    paginationParams = new LinkedMultiValueMap<>();
-    for (Map.Entry<String, String> entry : params.entrySet()) {
-      paginationParams.add(entry.getKey(), entry.getValue());
-    }
   }
 
   protected <T> T getRequestFromPath(String controllerDir, String jsonFileName, TypeReference<T> typeRef) {
@@ -120,12 +119,12 @@ public class BaseIntegrationTest {
     }
   }
 
-  protected <T> T getEntityFromPath(String jsonFileName, TypeReference<T> typeRef) {
+  protected <T> T getEntityFromPath(String entityDir, String jsonFileName, TypeReference<T> typeRef) {
 
     String methodName = Thread.currentThread()
         .getStackTrace()[2].getMethodName();
     String entityJsonPath =
-        String.format("json/entity/%s.json", jsonFileName, methodName);
+        String.format("json/entity/%s/%s.json", entityDir, jsonFileName, methodName);
 
     InputStream expectationJsonInputStream = this.getClass()
         .getClassLoader()
@@ -135,7 +134,8 @@ public class BaseIntegrationTest {
       String entityJson = IOUtils.toString(expectationJsonInputStream);
       return objectMapper.readValue(entityJson, typeRef);
     } catch (Exception e) {
-      log.error("#getEntityFromPath ERROR! with jsonFileName: {}, and error: {}", jsonFileName, e.getMessage(), e);
+      log.error("#getEntityFromPath ERROR! with entityDir:{}, jsonFileName: {}, and error: {}", entityDir, jsonFileName,
+          e.getMessage(), e);
       return null;
     }
   }

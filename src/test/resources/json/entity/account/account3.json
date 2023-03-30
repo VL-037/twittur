@@ -1,0 +1,21 @@
+{
+  "id": "ACCOUNT_ID3",
+  "createdBy": "system",
+  "createdDate": "2023-03-29T14:21:46.875003",
+  "updatedBy": "system",
+  "updatedDate": "2023-03-29T14:21:46.875003",
+  "markForDelete": false,
+  "firstName": "Robert",
+  "lastName": "Johnson",
+  "dateOfBirth": "1987-02-04",
+  "username": "robertjohnson789",
+  "accountName": "Robert's Account",
+  "bio": "I'm a software engineer",
+  "emailAddress": "robertjohnson789@gmail.com",
+  "phoneNumber": "+14045551212",
+  "salt": "$2a$10$MJgRIpYbLL9/pwyXj21kW.",
+  "password": "$2a$10$MJgRIpYbLL9/pwyXj21kW.VBuAbP3Ksrt2CnzMM5JJE3nltI92zN6",
+  "tweetsCount": 0,
+  "followersCount": 0,
+  "followingCount": 0
+}

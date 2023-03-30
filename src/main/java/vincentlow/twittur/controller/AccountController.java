@@ -202,9 +202,8 @@ public class AccountController extends BaseController {
 
       return toSuccessApiResponse(response, pageMetaData);
     } catch (RuntimeException e) {
-      log.error("#getAccountFollowers ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}",
-          pageNumber,
-          pageSize, e.getMessage(), e);
+      log.error("#getAccountFollowers ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
+          pageNumber, pageSize, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

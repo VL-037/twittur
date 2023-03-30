@@ -1,0 +1,21 @@
+{
+  "id": "ACCOUNT_ID2",
+  "createdBy": "system",
+  "createdDate": "2023-03-29T14:21:46.71894",
+  "updatedBy": "system",
+  "updatedDate": "2023-03-29T14:21:46.71894",
+  "markForDelete": false,
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "dateOfBirth": "1990-08-15",
+  "username": "janesmith456",
+  "accountName": "Jane's Account",
+  "bio": "I'm a graphic designer",
+  "emailAddress": "janesmith456@gmail.com",
+  "phoneNumber": "+14158123990",
+  "salt": "$2a$10$QjdspmEmDdqKVFni3l34v.",
+  "password": "$2a$10$QjdspmEmDdqKVFni3l34v.1hUsWE26mjFzQ3Y9QrKh/h7Qb4bJS2a",
+  "tweetsCount": 0,
+  "followersCount": 0,
+  "followingCount": 0
+}

@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import vincentlow.twittur.integration.BaseIntegrationTest;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
+import vincentlow.twittur.model.entity.AccountRelationship;
+import vincentlow.twittur.model.request.AccountRelationshipRequest;
 import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
 import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
@@ -31,6 +35,7 @@ import vincentlow.twittur.model.response.AccountResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
+import vincentlow.twittur.repository.AccountRelationshipRepository;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.service.CacheService;
 
@@ -48,10 +53,17 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
   private final String UPDATE_ACCOUNT_PASSWORD_REQUEST_JSON = "update-account-password-request";
 
+  private final String ACCOUNT_RELATIONSHIP_REQUEST_JSON = "account-relationship-request";
+
+  private final String UNKNOWN_ID = "UNKNOWN_ID";
+
   private final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private AccountRelationshipRepository accountRelationshipRepository;
 
   @Autowired
   private CacheService cacheService;
@@ -66,21 +78,35 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
   private Account account5;
 
+  private AccountRelationship accountRelationship1;
+
+  private AccountRelationship accountRelationship2;
+
   @BeforeEach
   public void setUp() {
 
-    account1 = getEntityFromPath("account1", new TypeReference<>() {});
-    account2 = getEntityFromPath("account2", new TypeReference<>() {});
-    account3 = getEntityFromPath("account3", new TypeReference<>() {});
-    account4 = getEntityFromPath("account4", new TypeReference<>() {});
-    account5 = getEntityFromPath("account5", new TypeReference<>() {});
+    paginationParams = new LinkedMultiValueMap<>();
+    for (Map.Entry<String, String> entry : params.entrySet()) {
+      paginationParams.add(entry.getKey(), entry.getValue());
+    }
+
+    account1 = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account1", new TypeReference<>() {});
+    account2 = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account2", new TypeReference<>() {});
+    account3 = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account3", new TypeReference<>() {});
+    account4 = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account4", new TypeReference<>() {});
+    account5 = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account5", new TypeReference<>() {});
+    accountRelationship1 =
+        getEntityFromPath(ACCOUNT_RELATIONSHIP_ENTITY_DIR, "account-relationship1", new TypeReference<>() {});
+    accountRelationship2 =
+        getEntityFromPath(ACCOUNT_RELATIONSHIP_ENTITY_DIR, "account-relationship2", new TypeReference<>() {});
   }
 
   @AfterEach
   public void tearDown() {
 
-    accountRepository.deleteAll();
     cacheService.flushAll();
+    accountRelationshipRepository.deleteAll();
+    accountRepository.deleteAll();
   }
 
   @Test
@@ -154,14 +180,13 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
     ApiSingleResponse<AccountResponse> expectation =
         getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
 
-    Account existingAccount = new Account();
-    existingAccount.setUsername(createAccountRequest.getUsername());
-    accountRepository.save(existingAccount);
+    createAccountRequest.setUsername(account1.getUsername());
+
+    accountRepository.save(account1);
 
     MvcResult result = mockMvc.perform(post(ApiPath.ACCOUNT).accept(MediaType.APPLICATION_JSON_VALUE)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectToContentString(createAccountRequest))
-        .params(paginationParams))
+        .content(objectToContentString(createAccountRequest)))
         .andReturn();
 
     ApiSingleResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
@@ -172,6 +197,31 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void createAccount_bioBlank_success() throws Exception {
+
+    CreateAccountRequest createAccountRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, CREATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+    ApiSingleResponse<AccountResponse> expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    accountRepository.save(account1);
+
+    createAccountRequest.setBio("");
+
+    MvcResult result = mockMvc.perform(post(ApiPath.ACCOUNT).accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectToContentString(createAccountRequest)))
+        .andReturn();
+
+    ApiSingleResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseSuccessApiSingleResponseAssertion(response);
+    assertThat(response.getData()).usingRecursiveComparison()
+        .ignoringFields(ignoredFields.toArray(new String[0]))
+        .isEqualTo(expectation.getData());
+  }
+
+  @Test
   public void createAccount_emailAddressExists_failed() throws Exception {
 
     CreateAccountRequest createAccountRequest =
@@ -179,14 +229,13 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
     ApiSingleResponse<AccountResponse> expectation =
         getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
 
-    Account existingAccount = new Account();
-    existingAccount.setEmailAddress(createAccountRequest.getEmailAddress());
-    accountRepository.save(existingAccount);
+    createAccountRequest.setEmailAddress(account1.getEmailAddress());
+
+    accountRepository.save(account1);
 
     MvcResult result = mockMvc.perform(post(ApiPath.ACCOUNT).accept(MediaType.APPLICATION_JSON_VALUE)
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectToContentString(createAccountRequest))
-        .params(paginationParams))
+        .content(objectToContentString(createAccountRequest)))
         .andReturn();
 
     ApiSingleResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
@@ -376,6 +425,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
@@ -401,6 +451,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.CONFLICT, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
@@ -445,6 +496,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
@@ -471,6 +523,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.CONFLICT, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
@@ -540,6 +593,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
@@ -590,6 +644,313 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
 
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void followAccount_success() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account followed = accountRepository.save(account1);
+    Account follower = accountRepository.save(account2);
+
+    accountRelationshipRequest.setFollowerId(follower.getId());
+    accountRelationshipRequest.setFollowedId(followed.getId());
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_follow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void followAccount_followerAccountNotFound_failed() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account followed = accountRepository.save(account1);
+
+    accountRelationshipRequest.setFollowerId(UNKNOWN_ID);
+    accountRelationshipRequest.setFollowedId(followed.getId());
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_follow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void followAccount_followedAccountNotFound_failed() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account follower = accountRepository.save(account2);
+
+    accountRelationshipRequest.setFollowerId(follower.getId());
+    accountRelationshipRequest.setFollowedId(UNKNOWN_ID);
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_follow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void unfollowAccount_success() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account follower = accountRepository.save(account2);
+    Account followed = accountRepository.save(account1);
+
+    accountRelationship1.setFollower(follower);
+    accountRelationship1.setFollowed(followed);
+    AccountRelationship relationship = accountRelationshipRepository.save(accountRelationship1);
+
+    accountRelationshipRequest.setFollowerId(relationship.getFollower()
+        .getId());
+    accountRelationshipRequest.setFollowedId(relationship.getFollowed()
+        .getId());
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_unfollow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void unfollowAccount_followerAccountNotFound_failed() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account followed = accountRepository.save(account1);
+
+    accountRelationship1.setFollowed(followed);
+    AccountRelationship relationship = accountRelationshipRepository.save(accountRelationship1);
+
+    accountRelationshipRequest.setFollowerId(UNKNOWN_ID);
+    accountRelationshipRequest.setFollowedId(relationship.getFollowed()
+        .getId());
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_unfollow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void unfollowAccount_followedAccountNotFound_failed() throws Exception {
+
+    AccountRelationshipRequest accountRelationshipRequest =
+        getRequestFromPath(ACCOUNT_CONTROLLER_DIR, ACCOUNT_RELATIONSHIP_REQUEST_JSON, new TypeReference<>() {});
+    ApiResponse expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account follower = accountRepository.save(account2);
+
+    accountRelationship1.setFollower(follower);
+    AccountRelationship relationship = accountRelationshipRepository.save(accountRelationship1);
+
+    accountRelationshipRequest.setFollowerId(relationship.getFollower()
+        .getId());
+    accountRelationshipRequest.setFollowedId(UNKNOWN_ID);
+
+    MvcResult result = mockMvc
+        .perform(post(ApiPath.ACCOUNT + "/_unfollow")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectToContentString(accountRelationshipRequest)))
+        .andReturn();
+
+    ApiResponse response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void getAccountFollowers_success() throws Exception {
+
+    ApiListResponse<AccountResponse> expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account account = accountRepository.save(account1);
+    Account follower1 = accountRepository.save(account2);
+    Account follower2 = accountRepository.save(account3);
+
+    accountRelationship1.setFollower(follower1);
+    accountRelationship1.setFollowed(account);
+
+    accountRelationship2.setFollower(follower2);
+    accountRelationship2.setFollowed(account);
+
+    accountRelationshipRepository.save(accountRelationship1);
+    accountRelationshipRepository.save(accountRelationship2);
+
+    MvcResult result = mockMvc
+        .perform(get(ApiPath.ACCOUNT + "/@" + account.getUsername() + "/followers")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .params(paginationParams))
+        .andReturn();
+
+    ApiListResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseSuccessApiListResponseAssertion(response, expectation);
+    successApiListResponseContentAssertion(response.getContent(), expectation.getContent());
+  }
+
+  @Test
+  public void getAccountFollowers_accountNotFound_failed() throws Exception {
+
+    ApiListResponse<AccountResponse> expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account account = accountRepository.save(account1);
+    Account follower1 = accountRepository.save(account2);
+    Account follower2 = accountRepository.save(account3);
+
+    accountRelationship1.setFollower(follower1);
+    accountRelationship1.setFollowed(account);
+
+    accountRelationship2.setFollower(follower2);
+    accountRelationship2.setFollowed(account);
+
+    accountRelationshipRepository.save(accountRelationship1);
+    accountRelationshipRepository.save(accountRelationship2);
+
+    MvcResult result = mockMvc
+        .perform(get(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/followers")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .params(paginationParams))
+        .andReturn();
+
+    ApiListResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void getAccountFollowing_success() throws Exception {
+
+    ApiListResponse<AccountResponse> expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account account = accountRepository.save(account1);
+    Account following1 = accountRepository.save(account2);
+    Account following2 = accountRepository.save(account3);
+
+    accountRelationship1.setFollower(account);
+    accountRelationship1.setFollowed(following1);
+
+    accountRelationship2.setFollower(account);
+    accountRelationship2.setFollowed(following2);
+
+    accountRelationshipRepository.save(accountRelationship1);
+    accountRelationshipRepository.save(accountRelationship2);
+
+    MvcResult result = mockMvc
+        .perform(get(ApiPath.ACCOUNT + "/@" + account.getUsername() + "/following")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .params(paginationParams))
+        .andReturn();
+
+    ApiListResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseSuccessApiListResponseAssertion(response, expectation);
+    successApiListResponseContentAssertion(response.getContent(), expectation.getContent());
+  }
+
+  @Test
+  public void getAccountFollowing_accountNotFound_failed() throws Exception {
+
+    ApiListResponse<AccountResponse> expectation =
+        getExpectationFromPath(ACCOUNT_CONTROLLER_DIR, new TypeReference<>() {});
+
+    Account account = accountRepository.save(account1);
+    Account following1 = accountRepository.save(account2);
+    Account following2 = accountRepository.save(account3);
+
+    accountRelationship1.setFollower(account);
+    accountRelationship1.setFollowed(following1);
+
+    accountRelationship2.setFollower(account);
+    accountRelationship2.setFollowed(following2);
+
+    accountRelationshipRepository.save(accountRelationship1);
+    accountRelationshipRepository.save(accountRelationship2);
+
+    MvcResult result = mockMvc
+        .perform(get(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/following")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .params(paginationParams))
+        .andReturn();
+
+    ApiListResponse<AccountResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.NOT_FOUND, response);
     assertThat(response).usingRecursiveComparison()
         .isEqualTo(expectation);
   }
