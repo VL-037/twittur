@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class DirectMessageServiceImpl implements DirectMessageService {
   }
 
   @Override
-  public List<DirectMessage> getDirectMessages(String senderId, String recipientId, int pageNumber, int pageSize) {
+  public Page<DirectMessage> getDirectMessages(String senderId, String recipientId, int pageNumber, int pageSize) {
 
     Account sender = accountRepositoryService.findByIdAndMarkForDeleteFalse(senderId);
     validateAccount(sender, ExceptionMessage.SENDER_ACCOUNT_NOT_FOUND);
@@ -77,10 +78,10 @@ public class DirectMessageServiceImpl implements DirectMessageService {
     allMessages.addAll(recipientToSenderMessages.getContent());
 
     /**
-     * oldest to newest. UI can consume [for 0 to N] and attach to
-     * the beginning of the array when doing Infinite Scrolling (scroll UP)
+     * oldest to newest. UI can consume [for 0 to N] and attach to the beginning of the array when doing Infinite
+     * Scrolling (scroll UP)
      */
     allMessages.sort(Comparator.comparing(BaseEntity::getCreatedDate));
-    return allMessages;
+    return new PageImpl<>(allMessages, pageable, allMessages.size());
   }
 }

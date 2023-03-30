@@ -1,0 +1,13 @@
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "id": "c2a86195-8e40-402c-ba1c-16308ee672fa",
+    "createdDate": "2023-03-22T03:16:18.731869",
+    "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+    "updatedDate": "2023-03-22T03:16:18.731869",
+    "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+    "message": "agreed, meet me at 12",
+    "status": "DELIVERED"
+  }
+}

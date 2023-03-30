@@ -1,0 +1,55 @@
+{
+  "code": 200,
+  "status": "OK",
+  "content": [
+    {
+      "id": "92fcb8a3-ec67-4a7b-806b-a5d553a66939",
+      "createdDate": "2023-03-21T11:23:00.182863",
+      "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+      "updatedDate": "2023-03-21T11:23:00.182863",
+      "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+      "senderId": "148e6258-fb90-4c64-925d-33312a1e5429",
+      "recipientId": "9a658f8a-736a-44e4-8d95-02bce4e36aa6",
+      "message": "message 1",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "48eb9c84-361d-498d-8489-e0662a73959f",
+      "createdDate": "2023-03-21T11:23:41.66156",
+      "createdBy": "6170b39a-8a94-430e-9976-79c4d9683988",
+      "updatedDate": "2023-03-21T11:23:41.66156",
+      "updatedBy": "6170b39a-8a94-430e-9976-79c4d9683988",
+      "senderId": "9a658f8a-736a-44e4-8d95-02bce4e36aa6",
+      "recipientId": "148e6258-fb90-4c64-925d-33312a1e5429",
+      "message": "message 2",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "3c172d8b-f147-44b3-aa57-847f88b2de9f",
+      "createdDate": "2023-03-21T11:24:02.542833",
+      "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+      "updatedDate": "2023-03-21T11:24:02.542833",
+      "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+      "senderId": "148e6258-fb90-4c64-925d-33312a1e5429",
+      "recipientId": "9a658f8a-736a-44e4-8d95-02bce4e36aa6",
+      "message": "message 3",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "d41a2972-3e5e-4c59-81ae-a1060eb56b36",
+      "createdDate": "2023-03-21T11:24:07.502352",
+      "createdBy": "6170b39a-8a94-430e-9976-79c4d9683988",
+      "updatedDate": "2023-03-21T11:24:07.502352",
+      "updatedBy": "6170b39a-8a94-430e-9976-79c4d9683988",
+      "senderId": "9a658f8a-736a-44e4-8d95-02bce4e36aa6",
+      "recipientId": "148e6258-fb90-4c64-925d-33312a1e5429",
+      "message": "message 4",
+      "status": "DELIVERED"
+    }
+  ],
+  "pageMetaData": {
+    "pageNumber": 0,
+    "pageSize": 2,
+    "totalRecords": 4
+  }
+}
