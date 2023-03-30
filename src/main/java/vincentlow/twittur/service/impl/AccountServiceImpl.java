@@ -126,6 +126,14 @@ public class AccountServiceImpl implements AccountService {
         .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
     validateArgument(validateBioLength(request.getBio()), ErrorCode.BIO_MAXIMAL_LENGTH_IS_100.getMessage());
 
+    if (!request.getUsername()
+        .equals(account.getUsername())) {
+      Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
+      if (Objects.nonNull(existingAccount)) {
+        throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
+      }
+    }
+
     BeanUtils.copyProperties(request, account);
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
@@ -141,6 +149,7 @@ public class AccountServiceImpl implements AccountService {
 
     StringUtil.trimStrings(request);
 
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
     validateArgument(StringUtils.isNotBlank(request.getEmailAddress()),
         ErrorCode.EMAIL_ADDRESS_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(request.getEmailAddress()
@@ -149,8 +158,7 @@ public class AccountServiceImpl implements AccountService {
     if (!request.getEmailAddress()
         .equals(account.getEmailAddress())) {
       Account existingAccount =
-          accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(account.getEmailAddress());
-
+          accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
       if (Objects.nonNull(existingAccount)) {
         throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
       }
@@ -171,6 +179,7 @@ public class AccountServiceImpl implements AccountService {
 
     StringUtil.trimStrings(request);
 
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
     if (StringUtils.isNotBlank(request.getPhoneNumber())) {
       validateArgument(isPhoneNumberValid(request.getPhoneNumber()), ErrorCode.PHONE_NUMBER_IS_NOT_VALID.getMessage());
     } else {
@@ -192,6 +201,7 @@ public class AccountServiceImpl implements AccountService {
 
     StringUtil.trimStrings(request);
 
+    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
     validateState(StringUtils.isNotBlank(request.getOldPassword()),
         ErrorCode.OLD_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
     validateState(StringUtils.isNotBlank(request.getNewPassword()),

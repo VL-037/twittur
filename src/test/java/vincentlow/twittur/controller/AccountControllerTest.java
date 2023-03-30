@@ -293,6 +293,7 @@ public class AccountControllerTest {
         .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(accountService).updateAccountPasswordByUsername(USERNAME, updateAccountPasswordRequest);
+
   }
 
   @Test

@@ -1,0 +1,76 @@
+{
+  "code": 200,
+  "status": "OK",
+  "content": [
+    {
+      "id": "b71943fc-37cd-4e57-915c-ee9d07512355",
+      "createdDate": "2023-03-29T14:21:46.574949",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.574949",
+      "updatedBy": "system",
+      "username": "johndoe123",
+      "accountName": "John's Account",
+      "bio": "I'm a web developer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    },
+    {
+      "id": "a0b66337-2260-44bb-9069-d09f5b5f199a",
+      "createdDate": "2023-03-29T14:21:46.71894",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.71894",
+      "updatedBy": "system",
+      "username": "janesmith456",
+      "accountName": "Jane's Account",
+      "bio": "I'm a graphic designer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    },
+    {
+      "id": "b40c2830-e1f9-425c-a383-543f091b1257",
+      "createdDate": "2023-03-29T14:21:46.875003",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.875003",
+      "updatedBy": "system",
+      "username": "robertjohnson789",
+      "accountName": "Robert's Account",
+      "bio": "I'm a software engineer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    },
+    {
+      "id": "ffbd00a9-7aeb-4b8c-b211-da65ee65c2f9",
+      "createdDate": "2023-03-29T14:21:46.968003",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.968003",
+      "updatedBy": "system",
+      "username": "emilydavis321",
+      "accountName": "Emily's Account",
+      "bio": "I'm a photographer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    },
+    {
+      "id": "0f7d7b24-bd42-4a8e-952a-e896f0938a98",
+      "createdDate": "2023-03-29T14:21:47.083072",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:47.083072",
+      "updatedBy": "system",
+      "username": "michaelbrown654",
+      "accountName": "Michael's Account",
+      "bio": "I'm a teacher",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    }
+  ],
+  "pageMetaData": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalRecords": 5
+  }
+}

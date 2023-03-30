@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import vincentlow.twittur.model.response.BaseResponse;
 import vincentlow.twittur.model.wrapper.PageMetaData;
 
 @Data
+@NoArgsConstructor // default const for JACKSON
 @AllArgsConstructor
 public class ApiListResponse<T extends BaseResponse> extends ApiResponse {
 

@@ -4,8 +4,10 @@ import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor // default const for JACKSON
 @AllArgsConstructor
 public class ApiSingleResponse<T> extends ApiResponse {
 

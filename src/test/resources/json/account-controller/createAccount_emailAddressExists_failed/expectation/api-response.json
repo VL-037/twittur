@@ -1,0 +1,5 @@
+{
+  "code": 409,
+  "status": "CONFLICT",
+  "error": "email is associated with an account, please login or reset password"
+}

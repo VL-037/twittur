@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "status": "OK",
+  "content": [],
+  "pageMetaData": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalRecords": 0
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "code": 200,
+  "status": "OK",
+  "content": [
+    {
+      "id": "a0b66337-2260-44bb-9069-d09f5b5f199a",
+      "createdDate": "2023-03-29T14:21:46.71894",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.71894",
+      "updatedBy": "system",
+      "username": "janesmith456",
+      "accountName": "Jane's Account",
+      "bio": "I'm a graphic designer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    },
+    {
+      "id": "b40c2830-e1f9-425c-a383-543f091b1257",
+      "createdDate": "2023-03-29T14:21:46.875003",
+      "createdBy": "system",
+      "updatedDate": "2023-03-29T14:21:46.875003",
+      "updatedBy": "system",
+      "username": "robertjohnson789",
+      "accountName": "Robert's Account",
+      "bio": "I'm a software engineer",
+      "tweetsCount": 0,
+      "followersCount": 0,
+      "followingCount": 0
+    }
+  ],
+  "pageMetaData": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalRecords": 2
+  }
+}
