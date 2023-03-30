@@ -122,7 +122,7 @@ public class TweetControllerIntegrationTest extends BaseIntegrationTest {
     tweetRepository.saveAll(tweetList);
 
     MvcResult result = mockMvc
-        .perform(get(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME).accept(MediaType.APPLICATION_JSON_VALUE)
+        .perform(get(ApiPath.ACCOUNT + "/@" + UNKNOWN_USERNAME + "/tweets").accept(MediaType.APPLICATION_JSON_VALUE)
             .contentType(MediaType.APPLICATION_JSON)
             .params(paginationParams))
         .andReturn();

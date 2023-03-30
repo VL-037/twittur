@@ -1,9 +1,11 @@
 package vincentlow.twittur.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -115,9 +117,32 @@ public class CacheServiceImplTest {
   }
 
   @Test
+  void get_throwsException() {
+
+    when(valueOperations.get(KEY)).thenThrow(new RuntimeException());
+    Account result = cacheService.get(KEY, new TypeReference<>() {});
+
+    verify(stringRedisTemplate).opsForValue();
+
+    assertNull(result);
+  }
+
+  @Test
   void set() throws JsonProcessingException {
 
-    cacheService.set(KEY, account, null);
+    cacheService.set(KEY, account, TTL);
+
+    verify(objectMapper).writeValueAsString(account);
+    verify(stringRedisTemplate).opsForValue();
+  }
+
+  @Test
+  void set_throwsException() throws JsonProcessingException {
+
+    doThrow(new RuntimeException()).when(valueOperations)
+        .set(KEY, CACHE_DATA, TTL, TimeUnit.SECONDS);
+
+    cacheService.set(KEY, account, TTL);
 
     verify(objectMapper).writeValueAsString(account);
     verify(stringRedisTemplate).opsForValue();
@@ -125,6 +150,17 @@ public class CacheServiceImplTest {
 
   @Test
   void deleteByPattern() {
+
+    cacheService.deleteByPattern(KEY_PATTERN);
+
+    verify(stringRedisTemplate).keys(KEY_PATTERN);
+    verify(stringRedisTemplate).delete(keys);
+  }
+
+  @Test
+  void deleteByPattern_throwsException() {
+
+    when(stringRedisTemplate.delete(keys)).thenThrow(new RuntimeException());
 
     cacheService.deleteByPattern(KEY_PATTERN);
 

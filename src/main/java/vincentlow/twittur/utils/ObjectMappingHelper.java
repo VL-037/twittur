@@ -17,13 +17,7 @@ public class ObjectMappingHelper {
     if (Objects.isNull(source)) {
       return null;
     }
-    try {
-      return ObjectMapper.map(source, targetClass);
-    } catch (Exception e) {
-      log.error("#toResponse ERROR! with source: {}, targetClass: {}, and error: {}", source, targetClass,
-          e.getMessage(), e);
-      return null;
-    }
+    return ObjectMapper.map(source, targetClass);
   }
 
   public static DirectMessageResponse toDirectMessageResponse(DirectMessage directMessage) {
