@@ -25,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,6 +48,12 @@ public class BaseIntegrationTest {
   protected final String ACCOUNT_ENTITY_DIR = "account";
 
   protected final String ACCOUNT_RELATIONSHIP_ENTITY_DIR = "account-relationship";
+
+  protected final String TWEET_ENTITY_DIR = "tweet";
+
+  protected final String UNKNOWN_ID = "UNKNOWN_ID";
+
+  protected final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
 
   protected final int PAGE_NUMBER = 0;
 
