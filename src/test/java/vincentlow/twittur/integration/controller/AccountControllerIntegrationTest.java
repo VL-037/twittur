@@ -55,10 +55,6 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
   private final String ACCOUNT_RELATIONSHIP_REQUEST_JSON = "account-relationship-request";
 
-  private final String UNKNOWN_ID = "UNKNOWN_ID";
-
-  private final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
-
   @Autowired
   private AccountRepository accountRepository;
 
