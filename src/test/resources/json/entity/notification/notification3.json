@@ -1,0 +1,15 @@
+{
+  "id": "5b22d4c5-36a5-499e-bfed-2e5edbc0b7e6",
+  "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "createdDate": "2023-03-22T03:16:19.371584",
+  "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "updatedDate": "2023-03-22T03:16:19.371584",
+  "markForDelete": false,
+  "senderId": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "title": "John's Account Tweeted:",
+  "message": "My tweet reactions is going to the moon",
+  "imageUrl": "IMAGE_URL",
+  "redirectUrl": "/@johndoe123/tweets/c2a86193-8e40-402d-ba1c-16308ee672fg",
+  "type": "NEW_TWEET",
+  "hasRead": false
+}

@@ -1,5 +1,7 @@
 package vincentlow.twittur.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -37,4 +39,10 @@ public class Notification extends BaseEntity {
 
   @Column(name = "has_read")
   private boolean hasRead;
+
+  @JsonIgnore
+  public Account getRecipient() {
+
+    return recipient;
+  }
 }

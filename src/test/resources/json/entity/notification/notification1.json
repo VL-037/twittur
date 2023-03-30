@@ -1,0 +1,15 @@
+{
+  "id": "dd5239d7-2e8d-4c89-bc1c-108314d1e880",
+  "createdBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "createdDate": "2023-03-22T03:16:51.485964",
+  "updatedBy": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "updatedDate": "2023-03-22T03:16:51.485964",
+  "markForDelete": false,
+  "senderId": "bb36c86d-7f03-4cc8-8798-47cd7427cba8",
+  "title": "John's Account Tweeted:",
+  "message": "For my followers <3",
+  "imageUrl": "IMAGE_URL",
+  "redirectUrl": "/@johndoe123/tweets/01ca5281-42de-49cd-b96b-382baefee61e",
+  "type": "NEW_TWEET",
+  "hasRead": false
+}
