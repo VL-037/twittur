@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import vincentlow.twittur.model.request.DirectMessageRequest;
 import vincentlow.twittur.model.response.DirectMessageResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
+import vincentlow.twittur.model.wrapper.PageMetaData;
 import vincentlow.twittur.service.DirectMessageService;
 
 @Slf4j
@@ -59,13 +61,14 @@ public class DirectMessageController extends BaseController {
     try {
       validatePageableRequest(pageNumber, DEFAULT_PAGE_SIZE);
 
-      List<DirectMessage> directMessages =
+      Page<DirectMessage> directMessages =
           directMessageService.getDirectMessages(senderId, recipientId, pageNumber, DEFAULT_PAGE_SIZE);
       List<DirectMessageResponse> response = directMessages.stream()
           .map(directMessage -> toDirectMessageResponse(directMessage))
           .collect(Collectors.toList());
+      PageMetaData pageMetaData = getPageMetaData(directMessages, pageNumber, DEFAULT_PAGE_SIZE);
 
-      return toSuccessApiResponse(response, null);
+      return toSuccessApiResponse(response, pageMetaData);
     } catch (Exception e) {
       log.error("#getDirectMessages ERROR! with senderId: {}, recipientId: {}, pageNumber: {}, and error: {}", senderId,
           recipientId, pageNumber, e.getMessage(), e);

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,8 @@ public class BaseIntegrationTest {
 
   protected final String TWEET_ENTITY_DIR = "tweet";
 
+  protected final String DIRECT_MESSAGE_ENTITY_DIR = "direct-message";
+
   protected final String UNKNOWN_ID = "UNKNOWN_ID";
 
   protected final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
@@ -59,8 +62,8 @@ public class BaseIntegrationTest {
 
   protected final int PAGE_SIZE = 10;
 
-  protected static final List<String> ignoredFields =
-      Arrays.asList("id", "createdBy", "createdDate", "updatedBy", "updatedDate");
+  protected List<String> ignoredFields =
+      new ArrayList<>(Arrays.asList("id", "createdBy", "createdDate", "updatedBy", "updatedDate"));
 
   @Autowired
   protected MockMvc mockMvc;
@@ -195,7 +198,7 @@ public class BaseIntegrationTest {
     }
   }
 
-  private void baseSuccessApiResponseAssertion(ApiResponse response) {
+  protected void baseSuccessApiResponseAssertion(ApiResponse response) {
 
     HttpStatus httpStatusOK = HttpStatus.OK;
 

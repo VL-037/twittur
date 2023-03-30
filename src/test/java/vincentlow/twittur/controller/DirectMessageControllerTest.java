@@ -24,6 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,6 +51,10 @@ public class DirectMessageControllerTest {
 
   private final int PAGE_NUMBER = 0;
 
+  private final int PAGE_SIZE = 4;
+
+  private final PageRequest PAGE_REQUEST = PageRequest.of(PAGE_NUMBER, PAGE_SIZE);
+
   private final String DIRECT_MESSAGE_API_PATH = ApiPath.DIRECT_MESSAGE + "/" + SENDER_ID + "/" + RECIPIENT_ID;
 
   @InjectMocks
@@ -69,6 +76,8 @@ public class DirectMessageControllerTest {
   private DirectMessage directMessage;
 
   private List<DirectMessage> directMessageList;
+
+  private Page<DirectMessage> directMessagePage;
 
   private DirectMessageRequest directMessageRequest;
 
@@ -96,6 +105,8 @@ public class DirectMessageControllerTest {
     directMessageList = new ArrayList<>();
     directMessageList.add(directMessage);
 
+    directMessagePage = new PageImpl<>(directMessageList, PAGE_REQUEST, directMessageList.size());
+
     directMessageRequest = DirectMessageRequest.builder()
         .message(MESSAGE)
         .build();
@@ -110,7 +121,7 @@ public class DirectMessageControllerTest {
 
     when(directMessageService.sendMessage(SENDER_ID, RECIPIENT_ID, directMessageRequest)).thenReturn(directMessage);
     when(directMessageService.getDirectMessages(eq(SENDER_ID), eq(RECIPIENT_ID), eq(PAGE_NUMBER), anyInt()))
-        .thenReturn(directMessageList);
+        .thenReturn(directMessagePage);
   }
 
   @AfterEach

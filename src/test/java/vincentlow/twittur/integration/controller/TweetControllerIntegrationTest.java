@@ -42,10 +42,6 @@ public class TweetControllerIntegrationTest extends BaseIntegrationTest {
 
   private final String UPDATE_TWEET_REQUEST_JSON = "update-tweet-request";
 
-  private final String UNKNOWN_ID = "UNKNOWN_ID";
-
-  private final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
-
   @Autowired
   private AccountRepository accountRepository;
 

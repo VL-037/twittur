@@ -113,9 +113,9 @@ public class DirectMessageServiceImplTest {
     when(directMessageRepository.save(any(DirectMessage.class))).thenReturn(senderToRecipientMessage);
 
     when(directMessageRepository.findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(SENDER_ID, RECIPIENT_ID,
-            PAGE_REQUEST)).thenReturn(senderToRecipientMessagePage);
+        PAGE_REQUEST)).thenReturn(senderToRecipientMessagePage);
     when(directMessageRepository.findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, SENDER_ID,
-            PAGE_REQUEST)).thenReturn(recipientToSenderMessagePage);
+        PAGE_REQUEST)).thenReturn(recipientToSenderMessagePage);
   }
 
   @AfterEach
@@ -142,15 +142,15 @@ public class DirectMessageServiceImplTest {
   @Test
   void getDirectMessages() {
 
-    List<DirectMessage> result =
+    Page<DirectMessage> result =
         directMessageService.getDirectMessages(SENDER_ID, RECIPIENT_ID, PAGE_NUMBER, PAGE_SIZE);
 
     verify(accountRepositoryService).findByIdAndMarkForDeleteFalse(SENDER_ID);
     verify(accountRepositoryService).findByIdAndMarkForDeleteFalse(RECIPIENT_ID);
     verify(directMessageRepository).findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(SENDER_ID, RECIPIENT_ID,
-            PAGE_REQUEST);
+        PAGE_REQUEST);
     verify(directMessageRepository).findAllBySenderIdAndRecipientIdOrderByCreatedDateDesc(RECIPIENT_ID, SENDER_ID,
-            PAGE_REQUEST);
+        PAGE_REQUEST);
 
     assertNotNull(result);
     assertFalse(result.isEmpty());
