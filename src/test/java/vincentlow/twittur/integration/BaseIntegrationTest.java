@@ -54,6 +54,8 @@ public class BaseIntegrationTest {
 
   protected final String DIRECT_MESSAGE_ENTITY_DIR = "direct-message";
 
+  protected final String NOTIFICATION_ENTITY_DIR = "notification";
+
   protected final String UNKNOWN_ID = "UNKNOWN_ID";
 
   protected final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
