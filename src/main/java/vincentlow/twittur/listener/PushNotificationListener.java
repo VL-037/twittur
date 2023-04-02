@@ -52,7 +52,6 @@ public class PushNotificationListener {
         followerNotification.setRecipient(follower);
         notificationRepository.save(followerNotification);
       }
-
     } catch (Exception e) {
       log.error("#processPushNotification ERROR! with record: {}, and error: {}", record, e.getMessage(), e);
     }

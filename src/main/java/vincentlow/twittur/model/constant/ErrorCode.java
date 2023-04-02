@@ -11,7 +11,7 @@ public enum ErrorCode {
   LAST_NAME_MAXIMAL_LENGTH_IS_50("last name maximal length is 50"),
   DATE_OF_BIRTH_MUST_NOT_BE_NULL("date of birth must not be null"),
   AGE_MUST_BE_AT_LEAST_13("age must be at least 13"),
-  USERNAME_MUST_NOT_BE_BLANK("username must not be null"),
+  USERNAME_MUST_NOT_BE_BLANK("username must not be blank"),
   USERNAME_MINIMAL_LENGTH_IS_5("username minimal length is 5"),
   USERNAME_MAXIMAL_LENGTH_IS_15("username maximal length is 15"),
   BIO_MAXIMAL_LENGTH_IS_100("bio maximal length is 100"),
@@ -25,13 +25,17 @@ public enum ErrorCode {
   PASSWORD_MINIMAL_LENGTH_IS_10("password minimal length is 10"),
   CONFIRM_PASSWORD_MUST_NOT_BE_BLANK("confirm password must not be blank"),
   CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD("confirm password is different with password"),
-  FOLLOWED_ID_MUST_NOT_BE_BLANK("followed id must not be null"),
-  FOLLOWER_ID_MUST_NOT_BE_BLANK("follower id must not be null"),
+  FOLLOWED_ID_MUST_NOT_BE_BLANK("followed id must not be blank"),
+  FOLLOWER_ID_MUST_NOT_BE_BLANK("follower id must not be blank"),
 
   // TWEET
-  TWEET_MUST_NOT_BE_NULL("tweet must not be null"),
   MESSAGE_MUST_NOT_BE_BLANK("message must not be blank"),
-  MESSAGE_MAXIMAL_LENGTH_IS_250("message maximal length is 250");
+  MESSAGE_MAXIMAL_LENGTH_IS_250("message maximal length is 250"),
+
+  // EMAIL
+  EMAIL_RECIPIENT_MUST_NOT_BE_BLANK("email recipient must not be blank"),
+  EMAIL_SUBJECT_MUST_NOT_BE_BLANK("email recipient must not be blank"),
+  EMAIL_BODY_MUST_NOT_BE_BLANK("email body must not be blank");
 
   private String message;
 

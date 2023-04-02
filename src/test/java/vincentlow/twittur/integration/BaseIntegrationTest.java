@@ -60,6 +60,8 @@ public class BaseIntegrationTest {
 
   protected final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";
 
+  protected final String UNKNOWN_EMAIL_ADDRESS = "UNKNOWN_EMAIL_ADDRESS";
+
   protected final int PAGE_NUMBER = 0;
 
   protected final int PAGE_SIZE = 10;

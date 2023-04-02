@@ -1,0 +1,13 @@
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "id": "0d56c187-2ddf-482f-a425-ed9f2189b185",
+    "createdDate": "2023-04-02T16:27:01.411451",
+    "createdBy": "system",
+    "updatedDate": "2023-04-02T16:27:01.411451",
+    "updatedBy": "system",
+    "recipient": "johndoe123@gmail.com",
+    "sent": true
+  }
+}

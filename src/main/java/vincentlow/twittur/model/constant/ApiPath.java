@@ -11,4 +11,6 @@ public interface ApiPath {
   String DIRECT_MESSAGE = BASE_PATH + "/direct-messages";
 
   String NOTIFICATION = BASE_PATH + "/notifications";
+
+  String EMAIL = BASE_PATH + "/emails";
 }

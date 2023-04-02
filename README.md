@@ -20,6 +20,7 @@
   - Create, Get, Update, Delete `Tweet`
   - Get, Send `Direct Message`
   - Get `Notification`
+  - Send `Email`
 - Tech
   - Log
   - Caching
@@ -34,8 +35,13 @@
 - Spring Boot version: 3.0.4
 - Databases: [PostgreSQL](https://www.postgresql.org/download), [Redis](https://github.com/ServiceStack/redis-windows/tree/master/downloads)
 - Message Broker: [Apache Kafka](https://kafka.apache.org/downloads)
+- Email Service: Gmail SMTP
 - IDE: [Intellij IDEA Community Edition](https://www.jetbrains.com/idea/download)
 - Build tool: [Maven 3.6.3](https://archive.apache.org/dist/maven/maven-3/3.6.3)
+
+## Email Configuration
+
+- fill `spring.mail.username` & `spring.mail.password` with your Google App Passwords credentials
 
 ## Run Project
 
