@@ -48,6 +48,7 @@
 
 ## Cron Job Configuration
 
+- Update both recipients for [notification](/rundeck/twittur_resendFailedEmails.yaml) with your email
 - After `Email Configuration` is done, download [Rundeck](https://www.rundeck.com/downloads)
 - Follow the steps: [Rundeck Windows Configuration](https://docs.rundeck.com/docs/administration/install/windows.html)
 - Go to [localhost:4440](http://localhost:4440)
@@ -55,7 +56,6 @@
 - Create `New Project`
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
-- Update both recipients for [notification](/rundeck/twittur_resendFailedEmails.yaml)
 
 ## Run Project
 
