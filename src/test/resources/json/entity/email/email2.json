@@ -1,0 +1,12 @@
+{
+  "id": "638fb0df-985b-44e7-960d-3b14d8bcb118",
+  "createdBy": "system",
+  "createdDate": "2023-04-03T19:23:54.961612",
+  "updatedBy": "system",
+  "updatedDate": "2023-04-03T19:23:54.961612",
+  "markForDelete": false,
+  "recipient": "johndoe123@gmail.com",
+  "subject": "Twittur Daily Email Blast",
+  "body": "<!DOCTYPE html>\n<html>\n  <body style=\"background-color: #f2f2f2;\">\n    <div style=\"background-color: white; padding: 20px; border: 1px solid #ccc;\">\n      <h1 style=\"color: #2d2d2d;\">Welcome to my Email!</h1>\n      <p style=\"color: #666;\">Hi How Are You</p>\n      <hr style=\"border-top: 1px solid #ccc;\">\n      <h2 style=\"color: #2d2d2d;\">Some Important Information</h2>\n      <ul style=\"color: #666;\">\n        <li>Item 1</li>\n        <li>Item 2</li>\n        <li>Item 3</li>\n      </ul>\n      <div style=\"background-color: #f2f2f2; padding: 10px;\">\n        <p style=\"color: #666;\">This is a box with some more information.</p>\n      </div>\n      <hr style=\"border-top: 1px solid #ccc;\">\n      <p style=\"color: #666;\">Thanks for reading!</p>\n    </div>\n  </body>\n</html>",
+  "sent": false
+}

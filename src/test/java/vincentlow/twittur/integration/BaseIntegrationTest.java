@@ -56,6 +56,8 @@ public class BaseIntegrationTest {
 
   protected final String NOTIFICATION_ENTITY_DIR = "notification";
 
+  protected final String EMAIL_ENTITY_DIR = "email";
+
   protected final String UNKNOWN_ID = "UNKNOWN_ID";
 
   protected final String UNKNOWN_USERNAME = "UNKNOWN_USERNAME";

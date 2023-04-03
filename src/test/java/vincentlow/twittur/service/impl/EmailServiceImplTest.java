@@ -9,11 +9,15 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.util.Pair;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import jakarta.mail.Session;
@@ -50,6 +54,8 @@ public class EmailServiceImplTest {
 
   private Email email;
 
+  private List<Email> emails;
+
   private EmailRequest emailRequest;
 
   private MimeMessage mimeMessage;
@@ -67,6 +73,9 @@ public class EmailServiceImplTest {
     email.setSubject(SUBJECT);
     email.setBody(BODY);
     email.setSent(SENT);
+
+    emails = new ArrayList<>();
+    emails.add(email);
 
     emailRequest = EmailRequest.builder()
         .recipient(EMAIL_ADDRESS)
@@ -104,5 +113,25 @@ public class EmailServiceImplTest {
     assertEquals(SUBJECT, result.getSubject());
     assertEquals(BODY, result.getBody());
     assertEquals(SENT, result.getSent());
+  }
+
+  @Test
+  void resendFailedEmails() {
+
+    emails.forEach(e -> e.setSent(false));
+
+    when(emailRepository.findAllBySentFalseAndMarkForDeleteFalse()).thenReturn(emails);
+    when(emailRepository.saveAll(any(List.class))).thenReturn(emails);
+
+    Pair<Integer, Integer> result = emailService.resendFailedEmails();
+
+    verify(emailRepository).findAllBySentFalseAndMarkForDeleteFalse();
+    verify(javaMailSender).createMimeMessage();
+    verify(javaMailSender).send(any(MimeMessage.class));
+    verify(emailRepository).saveAll(any(List.class));
+
+    assertNotNull(result);
+    assertNotNull(result.getFirst());
+    assertNotNull(result.getSecond());
   }
 }

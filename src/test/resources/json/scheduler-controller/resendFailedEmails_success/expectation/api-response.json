@@ -1,0 +1,8 @@
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "processedEmails": 3,
+    "succeedEmails": 3
+  }
+}

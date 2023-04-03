@@ -5,9 +5,12 @@ import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -53,7 +56,6 @@ public class EmailServiceImpl implements EmailService {
     email.setRecipient(request.getRecipient());
     email.setSubject(request.getSubject());
     email.setBody(request.getBody());
-    email.setSent(true);
 
     LocalDateTime now = LocalDateTime.now();
     email.setCreatedBy("system");
@@ -61,43 +63,71 @@ public class EmailServiceImpl implements EmailService {
     email.setUpdatedBy("system");
     email.setUpdatedDate(now);
 
+    Account account = accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getRecipient());
+    validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
+
+    String htmlBody = "<!DOCTYPE html>\n" +
+        "<html>\n" +
+        "  <body style=\"background-color: #f2f2f2;\">\n" +
+        "    <div style=\"background-color: white; padding: 20px; border: 1px solid #ccc;\">\n" +
+        "      <h1 style=\"color: #2d2d2d;\">Welcome to my Email!</h1>\n" +
+        "      <p style=\"color: #666;\">" + email.getBody() + "</p>\n" +
+        "      <hr style=\"border-top: 1px solid #ccc;\">\n" +
+        "      <h2 style=\"color: #2d2d2d;\">Some Important Information</h2>\n" +
+        "      <ul style=\"color: #666;\">\n" +
+        "        <li>Item 1</li>\n" +
+        "        <li>Item 2</li>\n" +
+        "        <li>Item 3</li>\n" +
+        "      </ul>\n" +
+        "      <div style=\"background-color: #f2f2f2; padding: 10px;\">\n" +
+        "        <p style=\"color: #666;\">This is a box with some more information.</p>\n" +
+        "      </div>\n" +
+        "      <hr style=\"border-top: 1px solid #ccc;\">\n" +
+        "      <p style=\"color: #666;\">Thanks for reading!</p>\n" +
+        "    </div>\n" +
+        "  </body>\n" +
+        "</html>";
+
+    email.setBody(htmlBody);
+    send(email);
+    return emailRepository.save(email);
+  }
+
+  @Override
+  public Pair<Integer, Integer> resendFailedEmails() {
+
+    List<Email> emails = emailRepository.findAllBySentFalseAndMarkForDeleteFalse();
+    List<Email> succeedEmails = new ArrayList<>();
+
+    for (Email email : emails) {
+      Email sentEmail = send(email);
+      if (sentEmail.getSent()) {
+        succeedEmails.add(sentEmail);
+      }
+    }
+
+    int processed = emails.size();
+    int succeed = emailRepository.saveAll(succeedEmails)
+        .size();
+
+    return Pair.of(processed, succeed);
+  }
+
+  private Email send(Email email) {
+
     try {
-      Account account = accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getRecipient());
-      validateAccount(account, ExceptionMessage.ACCOUNT_NOT_FOUND);
-
-      String htmlBody = "<!DOCTYPE html>\n" +
-          "<html>\n" +
-          "  <body style=\"background-color: #f2f2f2;\">\n" +
-          "    <div style=\"background-color: white; padding: 20px; border: 1px solid #ccc;\">\n" +
-          "      <h1 style=\"color: #2d2d2d;\">Welcome to my Email!</h1>\n" +
-          "      <p style=\"color: #666;\">" + email.getBody() + "</p>\n" +
-          "      <hr style=\"border-top: 1px solid #ccc;\">\n" +
-          "      <h2 style=\"color: #2d2d2d;\">Some Important Information</h2>\n" +
-          "      <ul style=\"color: #666;\">\n" +
-          "        <li>Item 1</li>\n" +
-          "        <li>Item 2</li>\n" +
-          "        <li>Item 3</li>\n" +
-          "      </ul>\n" +
-          "      <div style=\"background-color: #f2f2f2; padding: 10px;\">\n" +
-          "        <p style=\"color: #666;\">This is a box with some more information.</p>\n" +
-          "      </div>\n" +
-          "      <hr style=\"border-top: 1px solid #ccc;\">\n" +
-          "      <p style=\"color: #666;\">Thanks for reading!</p>\n" +
-          "    </div>\n" +
-          "  </body>\n" +
-          "</html>";
-
       MimeMessage message = javaMailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message, true);
       helper.setTo(email.getRecipient());
       helper.setSubject(email.getSubject());
-      helper.setText(htmlBody, true);
+      helper.setText(email.getBody(), true);
 
+      email.setSent(true);
       javaMailSender.send(message);
     } catch (MessagingException e) {
-      log.error("#EmailServiceImpl#sendEmail ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
+      log.error("#EmailServiceImpl#send ERROR! with email: {}, and error: {}", email, e.getMessage(), e);
       email.setSent(false);
     }
-    return emailRepository.save(email);
+    return email;
   }
 }
