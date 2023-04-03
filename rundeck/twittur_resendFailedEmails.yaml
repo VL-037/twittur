@@ -1,0 +1,40 @@
+- defaultTab: nodes
+  description: 'Resend all not sent Emails '
+  executionEnabled: true
+  loglevel: INFO
+  name: twittur_resendFailedEmails
+  nodeFilterEditable: false
+  notification:
+    onfailure:
+      email:
+        attachLog: true
+        attachLogInFile: true
+        recipients: your_email_address@gmail.com
+        subject: Rundeck Job - ${job.name} - Failed
+    onsuccess:
+      email:
+        attachLog: true
+        attachLogInFile: true
+        recipients: your_email_address@gmail.com
+        subject: Rundeck Job - ${job.name} - Success
+  notifyAvgDurationThreshold: null
+  plugins:
+    ExecutionLifecycle: null
+  # run command every hour, on every day of the month, every month of the year, starts from 12 midnight (01:00, 02:00, 03:00, ...)
+  schedule:
+    month: '*'
+    time:
+      hour: '*'
+      minute: '00'
+      seconds: '0'
+    weekday:
+      day: '*'
+    year: '*'
+  scheduleEnabled: true
+  sequence:
+    commands:
+      - exec: 'curl -X POST --header "Content-Type: application/json" --header "Accept:
+        application/json" "http://localhost:8080/api/v1/schedulers/resend-failed-emails"
+        | findstr ''"code": 200'''
+    keepgoing: false
+    strategy: node-first
