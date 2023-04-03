@@ -50,6 +50,7 @@ public class EmailControllerIntegrationTest extends BaseIntegrationTest {
   void tearDown() {
 
     cacheService.flushAll();
+    emailRepository.deleteAll();
     accountRepository.deleteAll();
   }
 

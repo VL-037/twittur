@@ -16,7 +16,7 @@ public class Email extends BaseEntity {
   @Column(name = "subject")
   private String subject;
 
-  @Column(name = "body")
+  @Column(name = "body", length = Integer.MAX_VALUE)
   private String body;
 
   @Column(name = "is_sent")

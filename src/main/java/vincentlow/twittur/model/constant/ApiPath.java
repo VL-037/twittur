@@ -13,4 +13,6 @@ public interface ApiPath {
   String NOTIFICATION = BASE_PATH + "/notifications";
 
   String EMAIL = BASE_PATH + "/emails";
+
+  String SCHEDULER = BASE_PATH + "/schedulers";
 }
