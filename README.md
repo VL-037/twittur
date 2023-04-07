@@ -10,8 +10,6 @@
 <img src="https://www.vectorlogo.zone/logos/rundeck/rundeck-icon.svg" alt="Rundeck" title="Rundeck" width="40px">
 </span>
 
-- API spec: [/api-spec](/api-spec)
-
 ## Features
 
 - Project
@@ -26,6 +24,7 @@
   - Caching
   - Data Streaming
   - Cron Job: [/rundeck](/rundeck)
+  - API spec: [/api-spec](/api-spec)
   - Database Migration: [/db/migration](/src/main/resources/db/migration)
   - Exception Handling: [ExceptionController.java](/src/main/java/vincentlow/twittur/controller/ExceptionController.java)
   - Test: [/unit-test](/src/test/java/vincentlow/twittur), [/integration-test](/src/test/java/vincentlow/twittur/integration)

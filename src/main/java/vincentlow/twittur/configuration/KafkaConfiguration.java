@@ -34,6 +34,9 @@ public class KafkaConfiguration {
   public ProducerFactory<String, Object> producerFactory() {
 
     Map<String, Object> producerProperties = kafkaProperties.buildProducerProperties();
+
+    // docker can't read bootstrap server if not defined
+    producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
     producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -44,6 +47,9 @@ public class KafkaConfiguration {
   public ConsumerFactory<String, String> consumerFactory() {
 
     Map<String, Object> consumerProperties = kafkaProperties.buildConsumerProperties();
+
+    // docker can't read bootstrap server if not defined
+    consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
     consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
