@@ -11,8 +11,6 @@
 <img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker" title="Docker" width="40px">
 </span>
 
-- API spec: [/api-spec](/api-spec)
-
 ## Features
 
 - Project
@@ -28,6 +26,7 @@
   - Dockerized
   - Data Streaming
   - Cron Job: [/rundeck](/rundeck)
+  - API spec: [/api-spec](/api-spec)
   - Database Migration: [/db/migration](/src/main/resources/db/migration)
   - Exception Handling: [ExceptionController.java](/src/main/java/vincentlow/twittur/controller/ExceptionController.java)
   - Test: [/unit-test](/src/test/java/vincentlow/twittur), [/integration-test](/src/test/java/vincentlow/twittur/integration)
@@ -67,6 +66,7 @@
 
 ## Run Project without Docker
 
+- Visit [no-docker](https://github.com/VL-037/twittur/tree/no-docker) branch
 - Run `Databases` & `Message Broker` locally
 - Create Database named `twittur`
 - Run `mvn spring-boot:run` or
