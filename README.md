@@ -10,7 +10,6 @@
 <img src="https://www.vectorlogo.zone/logos/rundeck/rundeck-icon.svg" alt="Rundeck" title="Rundeck" width="40px">
 </span>
 
-- Design: https://www.figma.com/file/E96Po8YZH8mMJdhhC5FAm2/Twittur?node-id=4%3A2&t=Dr04rG9HQSUs8DPT-1
 - API spec: [/api-spec](/api-spec)
 
 ## Features
