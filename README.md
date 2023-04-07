@@ -8,9 +8,9 @@
 <img src="https://www.vectorlogo.zone/logos/apache_kafka/apache_kafka-icon.svg" alt="Apache Kafka" title="Apache Kafka" width="40px">
 <img src="https://www.vectorlogo.zone/logos/redis/redis-icon.svg" alt="Redis" title="Redis" width="40px">
 <img src="https://www.vectorlogo.zone/logos/rundeck/rundeck-icon.svg" alt="Rundeck" title="Rundeck" width="40px">
+<img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker" title="Docker" width="40px">
 </span>
 
-- Design: https://www.figma.com/file/E96Po8YZH8mMJdhhC5FAm2/Twittur?node-id=4%3A2&t=Dr04rG9HQSUs8DPT-1
 - API spec: [/api-spec](/api-spec)
 
 ## Features
@@ -25,6 +25,7 @@
 - Tech
   - Log
   - Caching
+  - Dockerized
   - Data Streaming
   - Cron Job: [/rundeck](/rundeck)
   - Database Migration: [/db/migration](/src/main/resources/db/migration)
@@ -39,6 +40,7 @@
 - Message Broker: [Apache Kafka](https://kafka.apache.org/downloads)
 - Email Service: Gmail SMTP
 - Cron: [Rundeck](https://www.rundeck.com/downloads)
+- Container: [Docker](https://docs.docker.com/get-docker)
 - IDE: [Intellij IDEA Community Edition](https://www.jetbrains.com/idea/download)
 - Build tool: [Maven 3.6.3](https://archive.apache.org/dist/maven/maven-3/3.6.3)
 
@@ -57,9 +59,15 @@
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
 
-## Run Project
+## Docker Configuration
 
-- Run `Databases` & `Message Broker`
+- Run `docker build -t twittur:v1 .`
+- After build complete, run `docker compose up`
+- APIs will be served at [localhost:8080](http://localhost:8080)
+
+## Run Project without Docker
+
+- Run `Databases` & `Message Broker` locally
 - Create Database named `twittur`
 - Run `mvn spring-boot:run` or
 - Add VM options `--add-opens java.base/java.lang=ALL-UNNAMED` to IDE Run/Debug configuration for orika object mapper to work
