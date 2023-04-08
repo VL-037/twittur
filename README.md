@@ -60,8 +60,7 @@
 
 ## Docker Configuration
 
-- Run `docker build -t twittur:v1 .`
-- After build complete, run `docker compose up`
+- Run `docker compose up`
 - APIs will be served at [localhost:8080](http://localhost:8080)
 
 ## Run Project without Docker
