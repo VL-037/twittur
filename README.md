@@ -8,7 +8,6 @@
 <img src="https://www.vectorlogo.zone/logos/apache_kafka/apache_kafka-icon.svg" alt="Apache Kafka" title="Apache Kafka" width="40px">
 <img src="https://www.vectorlogo.zone/logos/redis/redis-icon.svg" alt="Redis" title="Redis" width="40px">
 <img src="https://www.vectorlogo.zone/logos/rundeck/rundeck-icon.svg" alt="Rundeck" title="Rundeck" width="40px">
-<img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker" title="Docker" width="40px">
 </span>
 
 ## Features
@@ -23,7 +22,6 @@
 - Tech
   - Log
   - Caching
-  - Dockerized
   - Data Streaming
   - Cron Job: [/rundeck](/rundeck)
   - API spec: [/api-spec](/api-spec)
@@ -39,7 +37,6 @@
 - Message Broker: [Apache Kafka](https://kafka.apache.org/downloads)
 - Email Service: Gmail SMTP
 - Cron: [Rundeck](https://www.rundeck.com/downloads)
-- Container: [Docker](https://docs.docker.com/get-docker)
 - IDE: [Intellij IDEA Community Edition](https://www.jetbrains.com/idea/download)
 - Build tool: [Maven 3.6.3](https://archive.apache.org/dist/maven/maven-3/3.6.3)
 
@@ -58,14 +55,8 @@
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
 
-## Docker Configuration
-
-- Run `docker compose up`
-- APIs will be served at [localhost:8080](http://localhost:8080)
-
 ## Run Project without Docker
 
-- Visit [no-docker](https://github.com/VL-037/twittur/tree/no-docker) branch
 - Run `Databases` & `Message Broker` locally
 - Create Database named `twittur`
 - Run `mvn spring-boot:run` or
