@@ -61,6 +61,10 @@
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
 
+## JWT Configuration
+
+- fill `jwt.secret.key` with your secret key. You can visit https://www.allkeysgenerator.com
+
 ## Run Project with Docker
 
 - Run `docker compose up`
