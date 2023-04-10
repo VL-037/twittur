@@ -68,7 +68,6 @@
 
 ## Run Project without Docker
 
-- Visit [no-docker](https://github.com/VL-037/twittur/tree/no-docker) branch
 - Run `Databases` & `Message Broker` locally
 - Create Database named `twittur`
 - Run `mvn spring-boot:run` or
