@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
 import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
 import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
@@ -42,21 +41,6 @@ public class AccountController extends BaseController {
 
   @Autowired
   private AccountService accountService;
-
-  @PostMapping
-  public ApiSingleResponse<AccountResponse> createAccount(
-      @RequestBody CreateAccountRequest request) {
-
-    try {
-      Account account = accountService.createAccount(request);
-      AccountResponse response = toResponse(account, AccountResponse.class);
-
-      return toSuccessApiResponse(response);
-    } catch (Exception e) {
-      log.error("#createAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
 
   @GetMapping
   public ApiListResponse<AccountResponse> getAccounts(

@@ -3,10 +3,10 @@ package vincentlow.twittur.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,14 +22,12 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.AccountRelationship;
@@ -42,7 +40,6 @@ import vincentlow.twittur.model.request.UpdateAccountRequest;
 import vincentlow.twittur.repository.service.AccountRelationshipRepositoryService;
 import vincentlow.twittur.repository.service.AccountRepositoryService;
 
-@ExtendWith(SpringExtension.class)
 public class AccountServiceImplTest {
 
   private final String ACCOUNT_ID = "ACCOUNT_ID";
@@ -64,8 +61,6 @@ public class AccountServiceImplTest {
   private final String NEW_EMAIL_ADDRESS = "NEW_EMAIL_ADDRESS";
 
   private final String PHONE_NUMBER = "+621234567890";
-
-  private final String NEW_PHONE_NUMBER = "+620987654321";
 
   private final String PASSWORD = "PASSWORD_PASSWORD";
 
@@ -100,6 +95,9 @@ public class AccountServiceImplTest {
   @Mock
   private AccountRelationshipRepositoryService accountRelationshipRepositoryService;
 
+  @Mock
+  private PasswordEncoder passwordEncoder;
+
   private Account account;
 
   private List<Account> accountList;
@@ -129,8 +127,6 @@ public class AccountServiceImplTest {
 
     openMocks(this);
 
-    String salt = BCrypt.gensalt();
-
     account = new Account();
     account.setId(ACCOUNT_ID);
     account.setFirstName(FIRST_NAME);
@@ -141,8 +137,7 @@ public class AccountServiceImplTest {
     account.setBio(BIO);
     account.setEmailAddress(EMAIL_ADDRESS);
     account.setPhoneNumber(PHONE_NUMBER);
-    account.setSalt(salt);
-    account.setPassword(BCrypt.hashpw(PASSWORD, salt));
+    account.setPassword(PASSWORD);
     account.setTweets(Collections.EMPTY_LIST);
     account.setFollowers(Collections.EMPTY_LIST);
     account.setFollowing(Collections.EMPTY_LIST);
@@ -222,6 +217,8 @@ public class AccountServiceImplTest {
 
     when(accountRepositoryService.findAll(any(PageRequest.class))).thenReturn(accountPage);
 
+    when(passwordEncoder.matches(eq(PASSWORD), anyString())).thenReturn(true);
+
     doNothing().when(accountRepositoryService)
         .saveAll(anyList());
 
@@ -243,46 +240,6 @@ public class AccountServiceImplTest {
   void tearDown() {
 
     verifyNoMoreInteractions(accountRepositoryService, accountRelationshipRepositoryService);
-  }
-
-  @Test
-  void createAccount() {
-
-    when(accountRepositoryService.findByUsernameAndMarkForDeleteFalse(USERNAME)).thenReturn(null);
-    when(accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(EMAIL_ADDRESS)).thenReturn(null);
-
-    Account result = accountService.createAccount(createAccountRequest);
-
-    verify(accountRepositoryService).findByUsernameAndMarkForDeleteFalse(USERNAME);
-    verify(accountRepositoryService).findByEmailAddressAndMarkForDeleteFalse(EMAIL_ADDRESS);
-    verify(accountRepositoryService).save(any(Account.class));
-
-    assertNotNull(result);
-    assertEquals(FIRST_NAME, result.getFirstName());
-    assertEquals(LAST_NAME, result.getLastName());
-    assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
-    assertEquals(USERNAME, result.getUsername());
-    assertEquals(ACCOUNT_NAME, result.getAccountName());
-    assertEquals(BIO, result.getBio());
-    assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
-    assertEquals(PHONE_NUMBER, result.getPhoneNumber());
-    assertNotNull(result.getSalt());
-    assertNotNull(result.getPassword());
-    assertTrue(result.getTweets()
-        .isEmpty());
-    assertTrue(result.getFollowers()
-        .isEmpty());
-    assertTrue(result.getFollowing()
-        .isEmpty());
-    assertTrue(result.getSentMessages()
-        .isEmpty());
-    assertTrue(result.getReceivedMessages()
-        .isEmpty());
-    assertTrue(result.getNotifications()
-        .isEmpty());
-    assertEquals(TWEETS_COUNT, result.getTweetsCount());
-    assertEquals(FOLLOWERS_COUNT, result.getFollowersCount());
-    assertEquals(FOLLOWING_COUNT, result.getFollowingCount());
   }
 
   @Test

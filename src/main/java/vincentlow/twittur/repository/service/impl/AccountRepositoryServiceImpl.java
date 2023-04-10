@@ -70,6 +70,12 @@ public class AccountRepositoryServiceImpl implements AccountRepositoryService {
   }
 
   @Override
+  public Account findByUsernameOrEmailAddressAndMarkForDeleteFalse(String username) {
+
+    return accountRepository.findByUsernameOrEmailAddressAndMarkForDeleteFalse(username);
+  }
+
+  @Override
   public void saveAll(List<Account> accounts) {
 
     cacheService.deleteByPattern(CacheKey.FIND_ALL_ACCOUNTS_PATTERN);

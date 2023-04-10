@@ -13,8 +13,8 @@
   "bio": "I'm a web developer",
   "emailAddress": "johndoe123@gmail.com",
   "phoneNumber": "+15417543010",
-  "salt": "$2a$10$C6Xexv19.OYVrt0mAVf5Te",
   "password": "$2a$10$C6Xexv19.OYVrt0mAVf5TeFWNxWpM7tt9rVI4/yeNDOdXUCudP3qS",
+  "role": "USER",
   "tweetsCount": 0,
   "followersCount": 0,
   "followingCount": 0

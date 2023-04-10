@@ -1,22 +1,30 @@
 package vincentlow.twittur.model.entity;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vincentlow.twittur.model.constant.Role;
 
 @Entity
 @Table(name = "account")
 @Data
 @NoArgsConstructor
-public class Account extends BaseEntity {
+public class Account extends BaseEntity implements UserDetails {
 
   @Column(name = "first_name")
   private String firstName;
@@ -39,30 +47,39 @@ public class Account extends BaseEntity {
   @Column(name = "email_address")
   private String emailAddress;
 
+  @JsonIgnore
   @Column(name = "phone_number")
   private String phoneNumber;
 
-  @Column(name = "salt")
-  private String salt;
-
+  @JsonIgnore
   @Column(name = "password")
   private String password;
 
+  @Column(name = "role")
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
+  @JsonIgnore
   @OneToMany(mappedBy = "creator")
   private List<Tweet> tweets;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "followed")
   private List<AccountRelationship> followers;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "follower")
   private List<AccountRelationship> following;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "sender")
   private List<DirectMessage> sentMessages;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "recipient")
   private List<DirectMessage> receivedMessages;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "recipient")
   private List<Notification> notifications;
 
@@ -75,39 +92,33 @@ public class Account extends BaseEntity {
   @Column(name = "following_count")
   private int followingCount;
 
-  @JsonIgnore
-  public List<Tweet> getTweets() {
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
 
-    return tweets;
+    return List.of(new SimpleGrantedAuthority(role.name()));
   }
 
-  @JsonIgnore
-  public List<AccountRelationship> getFollowers() {
+  @Override
+  public boolean isAccountNonExpired() {
 
-    return followers;
+    return true;
   }
 
-  @JsonIgnore
-  public List<AccountRelationship> getFollowing() {
+  @Override
+  public boolean isAccountNonLocked() {
 
-    return following;
+    return true;
   }
 
-  @JsonIgnore
-  public List<DirectMessage> getSentMessages() {
+  @Override
+  public boolean isCredentialsNonExpired() {
 
-    return sentMessages;
+    return true;
   }
 
-  @JsonIgnore
-  public List<DirectMessage> getReceivedMessages() {
+  @Override
+  public boolean isEnabled() {
 
-    return receivedMessages;
-  }
-
-  @JsonIgnore
-  public List<Notification> getNotifications() {
-
-    return notifications;
+    return true;
   }
 }

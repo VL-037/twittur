@@ -17,6 +17,8 @@ public interface AccountRepositoryService {
 
   Account findByEmailAddressAndMarkForDeleteFalse(String emailAddress);
 
+  Account findByUsernameOrEmailAddressAndMarkForDeleteFalse(String username);
+
   void saveAll(List<Account> accounts);
 
   Account findByIdAndMarkForDeleteFalse(String id);

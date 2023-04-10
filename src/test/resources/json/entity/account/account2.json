@@ -13,8 +13,8 @@
   "bio": "I'm a graphic designer",
   "emailAddress": "janesmith456@gmail.com",
   "phoneNumber": "+14158123990",
-  "salt": "$2a$10$QjdspmEmDdqKVFni3l34v.",
   "password": "$2a$10$QjdspmEmDdqKVFni3l34v.1hUsWE26mjFzQ3Y9QrKh/h7Qb4bJS2a",
+  "role": "USER",
   "tweetsCount": 0,
   "followersCount": 0,
   "followingCount": 0

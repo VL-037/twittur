@@ -21,6 +21,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
   Account findByEmailAddressAndMarkForDeleteFalse(String emailAddress);
 
+  @Query("SELECT a FROM Account a WHERE (a.username = :username OR a.emailAddress = :username) AND markForDelete = false")
+  Account findByUsernameOrEmailAddressAndMarkForDeleteFalse(String username);
+
   @Query("SELECT a FROM Account a JOIN AccountRelationship ar ON a.id = ar.follower.id WHERE ar.followed.id = :accountId")
   Page<Account> findFollowers(String accountId, Pageable pageable);
 

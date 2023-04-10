@@ -13,8 +13,8 @@
   "bio": "I'm a photographer",
   "emailAddress": "emilydavis321@gmail.com",
   "phoneNumber": "+13035551212",
-  "salt": "$2a$10$W5cp.z/53Jbb6A.lhyXBQO",
   "password": "$2a$10$W5cp.z/53Jbb6A.lhyXBQO/1FkhEaPTz389fVUu.jI8FiIZNsMtd6",
+  "role": "USER",
   "tweetsCount": 0,
   "followersCount": 0,
   "followingCount": 0
