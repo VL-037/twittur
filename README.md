@@ -9,13 +9,15 @@
 <img src="https://www.vectorlogo.zone/logos/redis/redis-icon.svg" alt="Redis" title="Redis" width="40px">
 <img src="https://www.vectorlogo.zone/logos/rundeck/rundeck-icon.svg" alt="Rundeck" title="Rundeck" width="40px">
 <img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker" title="Docker" width="40px">
+<img src="https://img.icons8.com/color/512/java-web-token.png" alt="JWT" title="JWT" width="40px">
 </span>
 
 ## Features
 
 - Project
-  - Create, Get, Update `Account` 
-  - Follow / Unfollow `Account`
+  - Register, Login
+  - Get, Update `Account` 
+  - Follow, Unfollow `Account`
   - Create, Get, Update, Delete `Tweet`
   - Get, Send `Direct Message`
   - Get `Notification`
@@ -23,6 +25,7 @@
 - Tech
   - Log
   - Caching
+  - JWT Auth
   - Dockerized
   - Data Streaming
   - Cron Job: [/rundeck](/rundeck)
@@ -58,7 +61,7 @@
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
 
-## Docker Configuration
+## Run Project with Docker
 
 - Run `docker compose up`
 - APIs will be served at [localhost:8080](http://localhost:8080)
