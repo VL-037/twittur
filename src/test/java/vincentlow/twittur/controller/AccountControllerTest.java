@@ -39,7 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
 import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
 import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
@@ -92,8 +91,6 @@ public class AccountControllerTest {
 
   private Page<Account> accountPage;
 
-  private CreateAccountRequest createAccountRequest;
-
   private UpdateAccountRequest updateAccountRequest;
 
   private UpdateAccountEmailRequest updateAccountEmailRequest;
@@ -124,9 +121,6 @@ public class AccountControllerTest {
 
     accountPage = new PageImpl<>(accountList, PAGE_REQUEST, accountList.size());
 
-    createAccountRequest = CreateAccountRequest.builder()
-        .build();
-
     updateAccountRequest = UpdateAccountRequest.builder()
         .build();
 
@@ -153,7 +147,6 @@ public class AccountControllerTest {
       multiValueParams.add(entry.getKey(), entry.getValue());
     }
 
-    when(accountService.createAccount(any(CreateAccountRequest.class))).thenReturn(account);
     when(accountService.findAccounts(PAGE_NUMBER, PAGE_SIZE)).thenReturn(accountPage);
     when(accountService.findAccountByUsername(USERNAME)).thenReturn(account);
     doNothing().when(accountService)
@@ -176,26 +169,6 @@ public class AccountControllerTest {
   void tearDown() {
 
     verifyNoMoreInteractions(accountService);
-  }
-
-  @Test
-  void createAccount() throws Exception {
-
-    this.mockMvc.perform(post(ApiPath.ACCOUNT).accept(MediaType.APPLICATION_JSON_VALUE)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(createAccountRequest)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
-        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
-        .andExpect(jsonPath("$.data.username", equalTo(USERNAME)))
-        .andExpect(jsonPath("$.data.accountName", equalTo(ACCOUNT_NAME)))
-        .andExpect(jsonPath("$.data.bio", equalTo(BIO)))
-        .andExpect(jsonPath("$.data.tweetsCount", equalTo(TWEETS_COUNT)))
-        .andExpect(jsonPath("$.data.followersCount", equalTo(FOLLOWERS_COUNT)))
-        .andExpect(jsonPath("$.data.followingCount", equalTo(FOLLOWING_COUNT)))
-        .andExpect(jsonPath("$.error", equalTo(null)));
-
-    verify(accountService).createAccount(createAccountRequest);
   }
 
   @Test

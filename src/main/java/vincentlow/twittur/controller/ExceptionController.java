@@ -2,6 +2,7 @@ package vincentlow.twittur.controller;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,6 +23,13 @@ public class ExceptionController extends BaseController {
 
     log.error("#handleBadRequestException ERROR! with error: {}", ex.getMessage());
     return toErrorApiResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  @ExceptionHandler(value = {AuthenticationException.class})
+  public ApiResponse handleAuthenticationException(AuthenticationException ex) {
+
+    log.error("#handleAuthenticationException ERROR! with error: {}", ex.getMessage());
+    return toErrorApiResponse(HttpStatus.FORBIDDEN, ExceptionMessage.AUTHENTICATION_FAILED);
   }
 
   @ExceptionHandler(value = {NotFoundException.class})

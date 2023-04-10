@@ -5,9 +5,7 @@ import static vincentlow.twittur.utils.ValidatorUtil.validateArgument;
 import static vincentlow.twittur.utils.ValidatorUtil.validateState;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,6 +28,7 @@ import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
+import vincentlow.twittur.model.constant.Role;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.AccountRelationship;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
@@ -57,45 +56,8 @@ public class AccountServiceImpl implements AccountService {
   @Autowired
   private AccountRelationshipRepositoryService accountRelationshipRepositoryService;
 
-  @Override
-  public Account createAccount(CreateAccountRequest request) {
-
-    StringUtil.trimStrings(request);
-    validateRequest(request);
-
-    Account existingAccount = accountRepositoryService.findByUsernameAndMarkForDeleteFalse(request.getUsername());
-    if (Objects.nonNull(existingAccount)) {
-      throw new ConflictException(ExceptionMessage.USERNAME_IS_TAKEN);
-    }
-
-    existingAccount = accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(request.getEmailAddress());
-    if (Objects.nonNull(existingAccount)) {
-      throw new ConflictException(ExceptionMessage.EMAIL_IS_ASSOCIATED_WITH_AN_ACCOUNT);
-    }
-
-    Account account = new Account();
-    BeanUtils.copyProperties(request, account);
-
-    String salt = BCrypt.gensalt();
-    String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
-
-    account.setSalt(salt);
-    account.setPassword(hashedPassword);
-    account.setTweets(Collections.EMPTY_LIST);
-    account.setFollowers(Collections.EMPTY_LIST);
-    account.setFollowing(Collections.EMPTY_LIST);
-    account.setSentMessages(Collections.EMPTY_LIST);
-    account.setReceivedMessages(Collections.EMPTY_LIST);
-    account.setNotifications(Collections.EMPTY_LIST);
-
-    LocalDateTime now = LocalDateTime.now();
-    account.setCreatedBy("system");
-    account.setCreatedDate(now);
-    account.setUpdatedBy("system");
-    account.setUpdatedDate(now);
-
-    return accountRepositoryService.save(account);
-  }
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   @Override
   public Page<Account> findAccounts(int pageNumber, int pageSize) {
@@ -212,18 +174,10 @@ public class AccountServiceImpl implements AccountService {
         ErrorCode.CONFIRM_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
     validateArgument(request.getNewPassword()
         .equals(request.getConfirmNewPassword()), ErrorCode.CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD.getMessage());
+    validateArgument(passwordEncoder.matches(request.getOldPassword(), account.getPassword()),
+        ErrorCode.OLD_PASSWORD_IS_WRONG.getMessage());
 
-    String oldSalt = account.getSalt();
-    String oldHashedPassword = account.getPassword();
-    String hashedPassword = BCrypt.hashpw(request.getOldPassword(), oldSalt);
-
-    validateArgument(hashedPassword.equals(oldHashedPassword), ErrorCode.OLD_PASSWORD_IS_WRONG.getMessage());
-
-    String newSalt = BCrypt.gensalt();
-    String newHashedPassword = BCrypt.hashpw(request.getNewPassword(), newSalt);
-
-    account.setSalt(newSalt);
-    account.setPassword(newHashedPassword);
+    account.setPassword(passwordEncoder.encode(request.getNewPassword()));
     account.setUpdatedBy(account.getId());
     account.setUpdatedDate(LocalDateTime.now());
 
@@ -328,57 +282,12 @@ public class AccountServiceImpl implements AccountService {
     return accountRepositoryService.findFollowing(account.getId(), PageRequest.of(pageNumber, pageSize));
   }
 
-  private void validateRequest(CreateAccountRequest request) {
-
-    validateState(Objects.nonNull(request), ErrorCode.REQUEST_MUST_NOT_BE_NULL.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getFirstName()),
-        ErrorCode.FIRST_NAME_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getFirstName()
-        .length() <= 50, ErrorCode.FIRST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getLastName()), ErrorCode.LAST_NAME_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getLastName()
-        .length() <= 50, ErrorCode.LAST_NAME_MAXIMAL_LENGTH_IS_50.getMessage());
-    validateState(Objects.nonNull(request.getDateOfBirth()), ErrorCode.DATE_OF_BIRTH_MUST_NOT_BE_NULL.getMessage());
-    validateArgument(getCurrentAge(request.getDateOfBirth()) >= 13, ErrorCode.AGE_MUST_BE_AT_LEAST_13.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getUsername()), ErrorCode.USERNAME_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getUsername()
-        .length() >= 5, ErrorCode.USERNAME_MINIMAL_LENGTH_IS_5.getMessage());
-    validateArgument(request.getUsername()
-        .length() <= 15, ErrorCode.USERNAME_MAXIMAL_LENGTH_IS_15.getMessage());
-    validateArgument(validateBioLength(request.getBio()), ErrorCode.BIO_MAXIMAL_LENGTH_IS_100.getMessage());
-    validateArgument(StringUtils.isNotBlank(request.getEmailAddress()),
-        ErrorCode.EMAIL_ADDRESS_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getEmailAddress()
-        .length() <= 62, ErrorCode.EMAIL_ADDRESS_MAXIMAL_LENGTH_IS_62.getMessage());
-
-    if (StringUtils.isNotBlank(request.getPhoneNumber())) {
-      validateArgument(isPhoneNumberValid(request.getPhoneNumber()), ErrorCode.PHONE_NUMBER_IS_NOT_VALID.getMessage());
-    } else {
-      request.setPhoneNumber(null);
-    }
-
-    validateState(StringUtils.isNotBlank(request.getPassword()), ErrorCode.PASSWORD_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getPassword()
-        .length() >= 10, ErrorCode.PASSWORD_MINIMAL_LENGTH_IS_10.getMessage());
-    validateState(StringUtils.isNotBlank(request.getConfirmPassword()),
-        ErrorCode.CONFIRM_PASSWORD_MUST_NOT_BE_BLANK.getMessage());
-    validateArgument(request.getPassword()
-        .equals(request.getConfirmPassword()), ErrorCode.CONFIRM_PASSWORD_IS_DIFFERENT_WITH_PASSWORD.getMessage());
-  }
-
   private boolean isPhoneNumberValid(String phoneNumber) {
 
     String regex = "^\\+(?:[0-9] ?){6,14}[0-9]$";
     Pattern pattern = Pattern.compile(regex);
     return pattern.matcher(phoneNumber)
         .matches();
-  }
-
-  private int getCurrentAge(LocalDate dateOfBirth) {
-
-    LocalDate currentDate = LocalDate.now();
-    return Period.between(dateOfBirth, currentDate)
-        .getYears();
   }
 
   private boolean validateBioLength(String bio) {
@@ -404,11 +313,8 @@ public class AccountServiceImpl implements AccountService {
     Account account = new Account();
     BeanUtils.copyProperties(request, account);
 
-    String salt = BCrypt.gensalt();
-    String hashedPassword = BCrypt.hashpw(request.getPassword(), salt);
-
-    account.setSalt(salt);
-    account.setPassword(hashedPassword);
+    account.setPassword(passwordEncoder.encode(request.getPassword()));
+    account.setRole(Role.USER);
     account.setTweets(Collections.EMPTY_LIST);
     account.setFollowers(Collections.EMPTY_LIST);
     account.setFollowing(Collections.EMPTY_LIST);

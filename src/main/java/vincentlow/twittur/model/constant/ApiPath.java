@@ -15,4 +15,6 @@ public interface ApiPath {
   String EMAIL = BASE_PATH + "/emails";
 
   String SCHEDULER = BASE_PATH + "/schedulers";
+
+  String AUTHENTICATION = BASE_PATH + "/auth";
 }

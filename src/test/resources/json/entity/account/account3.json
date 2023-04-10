@@ -13,8 +13,8 @@
   "bio": "I'm a software engineer",
   "emailAddress": "robertjohnson789@gmail.com",
   "phoneNumber": "+14045551212",
-  "salt": "$2a$10$MJgRIpYbLL9/pwyXj21kW.",
   "password": "$2a$10$MJgRIpYbLL9/pwyXj21kW.VBuAbP3Ksrt2CnzMM5JJE3nltI92zN6",
+  "role": "USER",
   "tweetsCount": 0,
   "followersCount": 0,
   "followingCount": 0

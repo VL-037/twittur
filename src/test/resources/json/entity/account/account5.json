@@ -13,8 +13,8 @@
   "bio": "I'm a teacher",
   "emailAddress": "michaelbrown654@gmail.com",
   "phoneNumber": "+12024567890",
-  "salt": "$2a$10$TnfHGurbx6E9dR8PsfAUM.",
   "password": "$2a$10$TnfHGurbx6E9dR8PsfAUM.jmhZ1YQdVowHjTaH/z1XkGklb1ta2DO",
+  "role": "USER",
   "tweetsCount": 0,
   "followersCount": 0,
   "followingCount": 0

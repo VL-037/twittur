@@ -4,15 +4,12 @@ import org.springframework.data.domain.Page;
 
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
 import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
 import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
 import vincentlow.twittur.model.request.UpdateAccountRequest;
 
 public interface AccountService {
-
-  Account createAccount(CreateAccountRequest request);
 
   Page<Account> findAccounts(int pageNumber, int pageSize);
 

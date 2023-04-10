@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.response.api.ApiResponse;
@@ -42,6 +43,18 @@ public class ExceptionControllerTest {
     assertEquals(HttpStatus.BAD_REQUEST.value(), result.getCode());
     assertEquals(HttpStatus.BAD_REQUEST.name(), result.getStatus());
     assertEquals(EXCEPTION_MESSAGE, result.getError());
+  }
+
+  @Test
+  void handleInternalAuthenticationServiceException() {
+
+    ApiResponse result = exceptionController
+        .handleAuthenticationException(new InternalAuthenticationServiceException(EXCEPTION_MESSAGE));
+
+    assertNotNull(result);
+    assertEquals(HttpStatus.FORBIDDEN.value(), result.getCode());
+    assertEquals(HttpStatus.FORBIDDEN.name(), result.getStatus());
+    assertEquals(ExceptionMessage.AUTHENTICATION_FAILED, result.getError());
   }
 
   @Test
