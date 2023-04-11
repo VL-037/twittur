@@ -19,6 +19,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import vincentlow.twittur.model.entity.Token;
+import vincentlow.twittur.repository.TokenRepository;
 import vincentlow.twittur.service.JWTService;
 
 @Component
@@ -28,6 +30,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
   @Autowired
   private JWTService jwtService;
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   @Autowired
   private UserDetailsService userDetailsService;
@@ -43,15 +48,16 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    String jwt = authHeader.substring(STARTS_WITH_BEARER.length());
-    String username = jwtService.extractUsername(jwt);
+    String jwtToken = authHeader.substring(STARTS_WITH_BEARER.length());
+    String username = jwtService.extractUsername(jwtToken);
 
     if (Objects.nonNull(username) &&
         Objects.isNull(SecurityContextHolder.getContext()
             .getAuthentication())) {
       UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      boolean isTokenValid = isTokenValid(tokenRepository.findByToken(jwtToken));
 
-      if (jwtService.isTokenValid(jwt, userDetails)) {
+      if (isTokenValid && jwtService.isTokenValid(jwtToken, userDetails)) {
         UsernamePasswordAuthenticationToken authToken =
             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -61,5 +67,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
       }
     }
     filterChain.doFilter(request, response);
+  }
+
+  private boolean isTokenValid(Token token) {
+
+    return !token.isExpired() && !token.isRevoked();
   }
 }

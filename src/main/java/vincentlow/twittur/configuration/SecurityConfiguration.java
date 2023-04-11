@@ -7,8 +7,10 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import vincentlow.twittur.jwt.JWTAuthenticationFilter;
 import vincentlow.twittur.model.constant.ApiPath;
@@ -22,6 +24,9 @@ public class SecurityConfiguration {
 
   @Autowired
   private AuthenticationProvider authenticationProvider;
+
+  @Autowired
+  private LogoutHandler logoutHandler;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -38,7 +43,14 @@ public class SecurityConfiguration {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .logout()
+        /*
+         * if URL invoked, spring will execute LogoutHandler & do not delegate it to any of our controllers
+         */
+        .logoutUrl(ApiPath.AUTHENTICATION + "/logout")
+        .addLogoutHandler(logoutHandler)
+        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
 
     return httpSecurity.build();
   }

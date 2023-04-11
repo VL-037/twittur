@@ -37,6 +37,7 @@ import vincentlow.twittur.model.response.api.ApiResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.repository.AccountRelationshipRepository;
 import vincentlow.twittur.repository.AccountRepository;
+import vincentlow.twittur.repository.TokenRepository;
 import vincentlow.twittur.service.CacheService;
 
 public class AccountControllerIntegrationTest extends BaseIntegrationTest {
@@ -57,6 +58,9 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   @Autowired
   private AccountRelationshipRepository accountRelationshipRepository;
@@ -102,6 +106,7 @@ public class AccountControllerIntegrationTest extends BaseIntegrationTest {
 
     cacheService.flushAll();
     accountRelationshipRepository.deleteAll();
+    tokenRepository.deleteAll();
     accountRepository.deleteAll();
   }
 

@@ -27,6 +27,7 @@ import vincentlow.twittur.model.response.NotificationResponse;
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.repository.AccountRepository;
 import vincentlow.twittur.repository.NotificationRepository;
+import vincentlow.twittur.repository.TokenRepository;
 
 public class NotificationControllerIntegrationTest extends BaseIntegrationTest {
 
@@ -36,6 +37,9 @@ public class NotificationControllerIntegrationTest extends BaseIntegrationTest {
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   @Autowired
   private NotificationRepository notificationRepository;
@@ -67,6 +71,7 @@ public class NotificationControllerIntegrationTest extends BaseIntegrationTest {
   public void tearDown() {
 
     notificationRepository.deleteAll();
+    tokenRepository.deleteAll();
     accountRepository.deleteAll();
   }
 

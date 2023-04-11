@@ -60,6 +60,10 @@ public class Account extends BaseEntity implements UserDetails {
   private Role role;
 
   @JsonIgnore
+  @OneToMany(mappedBy = "account") // 1 account have many tokens
+  private List<Token> tokens;
+
+  @JsonIgnore
   @OneToMany(mappedBy = "creator")
   private List<Tweet> tweets;
 

@@ -21,6 +21,7 @@ import vincentlow.twittur.model.request.LoginRequest;
 import vincentlow.twittur.model.response.AuthenticationResponse;
 import vincentlow.twittur.model.response.api.ApiSingleResponse;
 import vincentlow.twittur.repository.AccountRepository;
+import vincentlow.twittur.repository.TokenRepository;
 
 public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest {
 
@@ -32,6 +33,9 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
 
   @Autowired
   private AccountRepository accountRepository;
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   private Account account;
 
@@ -46,6 +50,7 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
   @AfterEach
   public void tearDown() {
 
+    tokenRepository.deleteAll();
     accountRepository.deleteAll();
   }
 

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -14,7 +15,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,12 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
 import vincentlow.twittur.model.constant.Role;
+import vincentlow.twittur.model.constant.TokenType;
 import vincentlow.twittur.model.entity.Account;
+import vincentlow.twittur.model.entity.Token;
 import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.LoginRequest;
 import vincentlow.twittur.model.response.AuthenticationResponse;
 import vincentlow.twittur.model.response.exception.ConflictException;
 import vincentlow.twittur.model.response.exception.ForbiddenException;
+import vincentlow.twittur.repository.TokenRepository;
 import vincentlow.twittur.repository.service.AccountRepositoryService;
 import vincentlow.twittur.service.AuthenticationService;
 import vincentlow.twittur.service.JWTService;
@@ -41,6 +44,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Autowired
   private AccountRepositoryService accountRepositoryService;
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
@@ -72,6 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     account.setPassword(passwordEncoder.encode(request.getPassword()));
     account.setRole(Role.USER);
+    account.setTokens(Collections.EMPTY_LIST);
     account.setTweets(Collections.EMPTY_LIST);
     account.setFollowers(Collections.EMPTY_LIST);
     account.setFollowing(Collections.EMPTY_LIST);
@@ -88,6 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     accountRepositoryService.save(account);
 
     String jwtToken = jwtService.generateToken(account);
+    saveAccountToken(account, jwtToken, now);
 
     return AuthenticationResponse.builder()
         .accessToken(jwtToken)
@@ -98,10 +106,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public AuthenticationResponse login(LoginRequest request) {
 
     try {
-      Authentication authentication = authenticationManager
+      authenticationManager
           .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-      String jwtToken = jwtService.generateToken((Account) authentication.getPrincipal());
+      Account account =
+          accountRepositoryService.findByUsernameOrEmailAddressAndMarkForDeleteFalse(request.getUsername());
+      String jwtToken = jwtService.generateToken(account);
+
+      revokeAllAccountToken(account); // Don't want multiple valid tokens when login
+      saveAccountToken(account, jwtToken, LocalDateTime.now());
 
       return AuthenticationResponse.builder()
           .accessToken(jwtToken)
@@ -171,5 +184,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     Pattern pattern = Pattern.compile(regex);
     return pattern.matcher(phoneNumber)
         .matches();
+  }
+
+  private void saveAccountToken(Account account, String jwtToken, LocalDateTime now) {
+
+    Token token = new Token();
+    token.setAccount(account);
+    token.setToken(jwtToken);
+    token.setType(TokenType.BEARER);
+    token.setCreatedBy("system");
+    token.setCreatedDate(now);
+    token.setUpdatedBy("system");
+    token.setUpdatedDate(now);
+
+    tokenRepository.save(token);
+  }
+
+  private void revokeAllAccountToken(Account account) {
+
+    List<Token> validAccountTokens = tokenRepository.findAllValidTokensByAccountId(account.getId());
+    if (!validAccountTokens.isEmpty()) {
+      validAccountTokens.forEach(token -> {
+        token.setExpired(true);
+        token.setRevoked(true);
+      });
+      tokenRepository.saveAll(validAccountTokens);
+    }
   }
 }
