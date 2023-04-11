@@ -1,5 +1,5 @@
 CREATE TABLE account (
-    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     date_of_birth DATE,
@@ -18,6 +18,21 @@ CREATE TABLE account (
     updated_by VARCHAR(255) NOT NULL,
     updated_date TIMESTAMP NOT NULL,
     mark_for_delete BOOLEAN NOT NULL
+);
+
+CREATE TABLE token(
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    account_id VARCHAR(36) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    is_expired BOOLEAN NOT NULL,
+    is_revoked BOOLEAN NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    created_date TIMESTAMP NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,
+    updated_date TIMESTAMP NOT NULL,
+    mark_for_delete BOOLEAN NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES account(id)
 );
 
 CREATE TABLE tweet (

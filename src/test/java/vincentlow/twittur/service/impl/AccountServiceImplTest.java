@@ -32,7 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import vincentlow.twittur.model.entity.Account;
 import vincentlow.twittur.model.entity.AccountRelationship;
 import vincentlow.twittur.model.request.AccountRelationshipRequest;
-import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.UpdateAccountEmailRequest;
 import vincentlow.twittur.model.request.UpdateAccountPasswordRequest;
 import vincentlow.twittur.model.request.UpdateAccountPhoneNumberRequest;
@@ -104,8 +103,6 @@ public class AccountServiceImplTest {
 
   private Page<Account> accountPage;
 
-  private CreateAccountRequest createAccountRequest;
-
   private UpdateAccountRequest updateAccountRequest;
 
   private UpdateAccountEmailRequest updateAccountEmailRequest;
@@ -149,18 +146,6 @@ public class AccountServiceImplTest {
     accountList.add(account);
 
     accountPage = new PageImpl<>(accountList, PAGE_REQUEST, accountList.size());
-
-    createAccountRequest = CreateAccountRequest.builder()
-        .firstName(FIRST_NAME)
-        .lastName(LAST_NAME)
-        .dateOfBirth(DATE_OF_BIRTH)
-        .username(USERNAME)
-        .accountName(ACCOUNT_NAME)
-        .emailAddress(EMAIL_ADDRESS)
-        .phoneNumber(PHONE_NUMBER)
-        .password(PASSWORD)
-        .confirmPassword(PASSWORD)
-        .build();
 
     updateAccountRequest = UpdateAccountRequest.builder()
         .username(USERNAME)

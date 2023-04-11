@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vincentlow.twittur.model.constant.Role;
 import vincentlow.twittur.model.entity.Account;
+import vincentlow.twittur.model.entity.Token;
+import vincentlow.twittur.repository.TokenRepository;
 import vincentlow.twittur.service.JWTService;
 
 class JWTAuthenticationFilterTest {
@@ -47,6 +50,9 @@ class JWTAuthenticationFilterTest {
   private JWTService jwtService;
 
   @Mock
+  private TokenRepository tokenRepository;
+
+  @Mock
   private UserDetailsService userDetailsService;
 
   private HttpServletRequest httpServletRequest;
@@ -56,6 +62,8 @@ class JWTAuthenticationFilterTest {
   private FilterChain filterChain;
 
   private Account account;
+
+  private Token token;
 
   @BeforeEach
   void setUp() throws ServletException, IOException {
@@ -71,18 +79,23 @@ class JWTAuthenticationFilterTest {
     account.setUsername(USERNAME);
     account.setRole(Role.USER);
 
+    token = new Token();
+    token.setAccount(account);
+    token.setToken(VALID_JWT_TOKEN);
+
     when(httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer " + VALID_JWT_TOKEN);
     doNothing().when(filterChain)
         .doFilter(httpServletRequest, httpServletResponse);
     when(jwtService.extractUsername(VALID_JWT_TOKEN)).thenReturn(USERNAME);
     when(userDetailsService.loadUserByUsername(USERNAME)).thenReturn(account);
+    when(tokenRepository.findByToken(VALID_JWT_TOKEN)).thenReturn(token);
     when(jwtService.isTokenValid(VALID_JWT_TOKEN, account)).thenReturn(true);
   }
 
   @AfterEach
   void tearDown() {
 
-    verifyNoMoreInteractions(jwtService, userDetailsService);
+    verifyNoMoreInteractions(jwtService, tokenRepository, userDetailsService);
   }
 
   @Test
@@ -96,6 +109,7 @@ class JWTAuthenticationFilterTest {
 
     verify(jwtService).extractUsername(VALID_JWT_TOKEN);
     verify(userDetailsService).loadUserByUsername(USERNAME);
+    verify(tokenRepository).findByToken(VALID_JWT_TOKEN);
     verify(jwtService).isTokenValid(VALID_JWT_TOKEN, account);
 
     assertNotNull(authentication);
