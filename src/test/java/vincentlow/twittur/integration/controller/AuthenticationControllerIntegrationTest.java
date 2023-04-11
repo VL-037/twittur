@@ -1,12 +1,15 @@
 package vincentlow.twittur.integration.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -43,6 +46,7 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
   public void setUp() {
 
     ignoredFields.add("accessToken");
+    ignoredFields.add("refreshToken");
 
     account = getEntityFromPath(ACCOUNT_ENTITY_DIR, "account1", new TypeReference<>() {});
   }
@@ -71,6 +75,10 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
     ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
 
     baseSuccessApiSingleResponseAssertion(response);
+    assertNotNull(response.getData()
+        .getAccessToken());
+    assertNotNull(response.getData()
+        .getRefreshToken());
     assertThat(response.getData()).usingRecursiveComparison()
         .ignoringFields(ignoredFields.toArray(new String[0]))
         .isEqualTo(expectation.getData());
@@ -93,6 +101,10 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
     ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
 
     baseSuccessApiSingleResponseAssertion(response);
+    assertNotNull(response.getData()
+        .getAccessToken());
+    assertNotNull(response.getData()
+        .getRefreshToken());
     assertThat(response.getData()).usingRecursiveComparison()
         .ignoringFields(ignoredFields.toArray(new String[0]))
         .isEqualTo(expectation.getData());
@@ -115,6 +127,10 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
     ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
 
     baseSuccessApiSingleResponseAssertion(response);
+    assertNotNull(response.getData()
+        .getAccessToken());
+    assertNotNull(response.getData()
+        .getRefreshToken());
     assertThat(response.getData()).usingRecursiveComparison()
         .ignoringFields(ignoredFields.toArray(new String[0]))
         .isEqualTo(expectation.getData());
@@ -198,6 +214,10 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
     ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
 
     baseSuccessApiSingleResponseAssertion(response);
+    assertNotNull(response.getData()
+        .getAccessToken());
+    assertNotNull(response.getData()
+        .getRefreshToken());
     assertThat(response.getData()).usingRecursiveComparison()
         .ignoringFields(ignoredFields.toArray(new String[0]))
         .isEqualTo(expectation.getData());
@@ -224,4 +244,97 @@ public class AuthenticationControllerIntegrationTest extends BaseIntegrationTest
         .isEqualTo(expectation);
   }
 
+  @Test
+  public void refreshToken_success() throws Exception {
+
+    CreateAccountRequest createAccountRequest =
+        getRequestFromPath(AUTHENTICATION_CONTROLLER_DIR, CREATE_ACCOUNT_REQUEST_JSON, new TypeReference<>() {});
+    LoginRequest loginRequest =
+        getRequestFromPath(AUTHENTICATION_CONTROLLER_DIR, LOGIN_REQUEST_JSON, new TypeReference<>() {});
+    ApiSingleResponse<AuthenticationResponse> expectation =
+        getExpectationFromPath(AUTHENTICATION_CONTROLLER_DIR, new TypeReference<>() {});
+
+    loginRequest.setUsername(createAccountRequest.getUsername());
+    loginRequest.setPassword(createAccountRequest.getPassword());
+
+    mockMvc.perform(post(ApiPath.AUTHENTICATION + "/register")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectToContentString(createAccountRequest)))
+        .andReturn();
+
+    mockMvc.perform(post(ApiPath.AUTHENTICATION + "/logout")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    MvcResult loginResult = mockMvc.perform(post(ApiPath.AUTHENTICATION + "/login")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectToContentString(loginRequest)))
+        .andReturn();
+
+    ApiSingleResponse<AuthenticationResponse> loginResponse = getMvcResponse(loginResult, new TypeReference<>() {});
+    String oldAccessToken = loginResponse.getData()
+        .getAccessToken();
+    String refreshToken = loginResponse.getData()
+        .getRefreshToken();
+
+    Thread.sleep(1000);
+
+    MvcResult result = mockMvc.perform(post(ApiPath.AUTHENTICATION + "/refresh-token")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken))
+        .andReturn();
+
+    ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseSuccessApiSingleResponseAssertion(response);
+    assertNotNull(response.getData()
+        .getAccessToken());
+    assertNotNull(response.getData()
+        .getRefreshToken());
+    assertFalse(response.getData()
+        .getAccessToken()
+        .equals(oldAccessToken));
+    assertThat(response.getData()).usingRecursiveComparison()
+        .ignoringFields(ignoredFields.toArray(new String[0]))
+        .isEqualTo(expectation.getData());
+  }
+
+  @Test
+  public void refreshToken_nullHeader_failed() throws Exception {
+
+    ApiSingleResponse<AuthenticationResponse> expectation =
+        getExpectationFromPath(AUTHENTICATION_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc.perform(post(ApiPath.AUTHENTICATION + "/refresh-token")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+    ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.FORBIDDEN, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
+
+  @Test
+  public void refreshToken_invalidRefreshToken_failed() throws Exception {
+
+    ApiSingleResponse<AuthenticationResponse> expectation =
+        getExpectationFromPath(AUTHENTICATION_CONTROLLER_DIR, new TypeReference<>() {});
+
+    MvcResult result = mockMvc.perform(post(ApiPath.AUTHENTICATION + "/refresh-token")
+        .accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.AUTHORIZATION, "INVALID_REFRESH_TOKEN"))
+        .andReturn();
+    ApiSingleResponse<AuthenticationResponse> response = getMvcResponse(result, new TypeReference<>() {});
+
+    baseErrorApiResponseAssertion(HttpStatus.FORBIDDEN, response);
+    assertThat(response).usingRecursiveComparison()
+        .isEqualTo(expectation);
+  }
 }

@@ -120,7 +120,7 @@ public class JWTServiceImplTest {
   @Test
   void generateToken() {
 
-    String result = jwtService.generateToken(userDetails);
+    String result = jwtService.generateAccessToken(userDetails);
 
     assertNotNull(result);
   }
@@ -128,7 +128,7 @@ public class JWTServiceImplTest {
   @Test
   void generateToken_WithClaims() {
 
-    String result = jwtService.generateToken(extractClaims, userDetails);
+    String result = jwtService.generateAccessToken(userDetails);
 
     assertNotNull(result);
   }

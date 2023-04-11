@@ -3,6 +3,7 @@ package vincentlow.twittur.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import vincentlow.twittur.jwt.JWTAuthenticationFilter;
 import vincentlow.twittur.model.constant.ApiPath;
@@ -48,7 +50,7 @@ public class SecurityConfiguration {
         /*
          * if URL invoked, spring will execute LogoutHandler & do not delegate it to any of our controllers
          */
-        .logoutUrl(ApiPath.AUTHENTICATION + "/logout")
+        .logoutRequestMatcher(new AntPathRequestMatcher(ApiPath.AUTHENTICATION + "/logout", HttpMethod.POST.name()))
         .addLogoutHandler(logoutHandler)
         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
 

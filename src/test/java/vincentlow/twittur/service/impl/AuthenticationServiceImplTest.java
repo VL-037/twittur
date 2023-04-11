@@ -60,6 +60,8 @@ public class AuthenticationServiceImplTest {
 
   private final String ACCESS_TOKEN = "ACCESS_TOKEN";
 
+  private final String REFRESH_TOKEN = "REFRESH_TOKEN";
+
   @InjectMocks
   private AuthenticationServiceImpl authenticationService;
 
@@ -80,7 +82,9 @@ public class AuthenticationServiceImplTest {
 
   private Account account;
 
-  private Token token;
+  private Token accessToken;
+
+  private Token refreshToken;
 
   private List<Token> tokens;
 
@@ -111,13 +115,19 @@ public class AuthenticationServiceImplTest {
     account.setReceivedMessages(Collections.EMPTY_LIST);
     account.setNotifications(Collections.EMPTY_LIST);
 
-    token = new Token();
-    token.setAccount(account);
-    token.setToken(ACCESS_TOKEN);
-    token.setType(TokenType.BEARER);
+    accessToken = new Token();
+    accessToken.setAccount(account);
+    accessToken.setToken(ACCESS_TOKEN);
+    accessToken.setType(TokenType.BEARER);
+
+    refreshToken = new Token();
+    refreshToken.setAccount(account);
+    refreshToken.setToken(REFRESH_TOKEN);
+    refreshToken.setType(TokenType.BEARER);
 
     tokens = new ArrayList<>();
-    tokens.add(token);
+    tokens.add(accessToken);
+    tokens.add(refreshToken);
 
     createAccountRequest = CreateAccountRequest.builder()
         .firstName(FIRST_NAME)
@@ -140,8 +150,9 @@ public class AuthenticationServiceImplTest {
     when(accountRepositoryService.findByEmailAddressAndMarkForDeleteFalse(USERNAME)).thenReturn(null);
     when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCRYPTED_PASSWORD);
     when(accountRepositoryService.save(any(Account.class))).thenReturn(account);
-    when(jwtService.generateToken(any(Account.class))).thenReturn(ACCESS_TOKEN);
-    when(tokenRepository.save(any(Token.class))).thenReturn(token);
+    when(jwtService.generateAccessToken(any(Account.class))).thenReturn(ACCESS_TOKEN);
+    when(jwtService.generateRefreshToken(any(Account.class))).thenReturn(REFRESH_TOKEN);
+    when(tokenRepository.save(any(Token.class))).thenReturn(accessToken);
 
     when(accountRepositoryService.findByUsernameOrEmailAddressAndMarkForDeleteFalse(USERNAME)).thenReturn(account);
     when(tokenRepository.findAllValidTokensByAccountId(ACCOUNT_ID)).thenReturn(tokens);
@@ -163,13 +174,14 @@ public class AuthenticationServiceImplTest {
     verify(accountRepositoryService).findByEmailAddressAndMarkForDeleteFalse(EMAIL_ADDRESS);
     verify(passwordEncoder).encode(PASSWORD);
     verify(accountRepositoryService).save(any(Account.class));
-    verify(jwtService).generateToken(any(Account.class));
+    verify(jwtService).generateAccessToken(any(Account.class));
+    verify(jwtService).generateRefreshToken(any(Account.class));
     verify(tokenRepository).save(any(Token.class));
 
     assertNotNull(result);
-    assertEquals(token.getToken(), result.getAccessToken());
-    assertEquals(TokenType.BEARER, token.getType());
-    assertEquals(account, token.getAccount());
+    assertEquals(accessToken.getToken(), result.getAccessToken());
+    assertEquals(TokenType.BEARER, accessToken.getType());
+    assertEquals(account, accessToken.getAccount());
   }
 
   @Test
@@ -179,12 +191,18 @@ public class AuthenticationServiceImplTest {
 
     verify(authenticationManager).authenticate(any(Authentication.class));
     verify(accountRepositoryService).findByUsernameOrEmailAddressAndMarkForDeleteFalse(USERNAME);
-    verify(jwtService).generateToken(any(Account.class));
+    verify(jwtService).generateAccessToken(any(Account.class));
+    verify(jwtService).generateRefreshToken(any(Account.class));
     verify(tokenRepository).findAllValidTokensByAccountId(ACCOUNT_ID);
     verify(tokenRepository).saveAll(tokens);
     verify(tokenRepository).save(any(Token.class));
 
     assertNotNull(result);
     assertEquals(ACCESS_TOKEN, result.getAccessToken());
+  }
+
+  @Test
+  void refreshToken() {
+
   }
 }

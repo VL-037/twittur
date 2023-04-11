@@ -1,6 +1,7 @@
 package vincentlow.twittur.controller;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -15,12 +16,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.request.CreateAccountRequest;
 import vincentlow.twittur.model.request.LoginRequest;
@@ -30,6 +33,10 @@ import vincentlow.twittur.service.AuthenticationService;
 public class AuthenticationControllerTest {
 
   private final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
+  private final String REFRESH_TOKEN = "REFRESH_TOKEN";
+
+  private final String NEW_ACCESS_TOKEN = "NEW_ACCESS_TOKEN";
 
   @InjectMocks
   private AuthenticationController authenticationController;
@@ -67,6 +74,7 @@ public class AuthenticationControllerTest {
 
     authenticationResponse = AuthenticationResponse.builder()
         .accessToken(ACCESS_TOKEN)
+        .refreshToken(REFRESH_TOKEN)
         .build();
 
     when(authenticationService.register(createAccountRequest)).thenReturn(authenticationResponse);
@@ -88,7 +96,8 @@ public class AuthenticationControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
         .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
-        .andExpect(jsonPath("$.data.accessToken", equalTo(ACCESS_TOKEN)))
+        .andExpect(jsonPath("$.data.access_token", equalTo(ACCESS_TOKEN)))
+        .andExpect(jsonPath("$.data.refresh_token", equalTo(REFRESH_TOKEN)))
         .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(authenticationService).register(createAccountRequest);
@@ -103,9 +112,30 @@ public class AuthenticationControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
         .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
-        .andExpect(jsonPath("$.data.accessToken", equalTo(ACCESS_TOKEN)))
+        .andExpect(jsonPath("$.data.access_token", equalTo(ACCESS_TOKEN)))
+        .andExpect(jsonPath("$.data.refresh_token", equalTo(REFRESH_TOKEN)))
         .andExpect(jsonPath("$.error", equalTo(null)));
 
     verify(authenticationService).login(loginRequest);
+  }
+
+  @Test
+  void refreshToken() throws Exception {
+
+    authenticationResponse.setAccessToken(NEW_ACCESS_TOKEN);
+
+    when(authenticationService.refreshToken(any(HttpServletRequest.class))).thenReturn(authenticationResponse);
+
+    this.mockMvc.perform(post(ApiPath.AUTHENTICATION + "/refresh-token").accept(MediaType.APPLICATION_JSON_VALUE)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + REFRESH_TOKEN))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.code", equalTo(httpStatus.value())))
+        .andExpect(jsonPath("$.status", equalTo(httpStatus.name())))
+        .andExpect(jsonPath("$.data.access_token", equalTo(NEW_ACCESS_TOKEN)))
+        .andExpect(jsonPath("$.data.refresh_token", equalTo(REFRESH_TOKEN)))
+        .andExpect(jsonPath("$.error", equalTo(null)));
+
+    verify(authenticationService).refreshToken(any(HttpServletRequest.class));
   }
 }
