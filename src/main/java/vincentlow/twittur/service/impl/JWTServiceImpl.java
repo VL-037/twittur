@@ -23,6 +23,12 @@ public class JWTServiceImpl implements JWTService {
   @Value("${jwt.secret.key}")
   private String jwtSecretKey;
 
+  @Value("${jwt.access-token.expirationInMs}")
+  private long accessTokenExpirationInMs;
+
+  @Value("${jwt.refresh-token.expirationInMs}")
+  private long refreshTokenExpirationInMs;
+
   @Override
   public String extractUsername(String token) {
 
@@ -36,21 +42,15 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public String generateToken(UserDetails userDetails) {
+  public String generateAccessToken(UserDetails userDetails) {
 
-    return generateToken(new HashMap<>(), userDetails);
+    return buildJWTToken(new HashMap<>(), userDetails, accessTokenExpirationInMs);
   }
 
   @Override
-  public String generateToken(Map<String, Object> extractClaims, UserDetails userDetails) {
+  public String generateRefreshToken(UserDetails userDetails) {
 
-    return Jwts.builder()
-        .setClaims(extractClaims)
-        .setSubject(userDetails.getUsername())
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60)))
-        .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-        .compact();
+    return buildJWTToken(new HashMap<>(), userDetails, refreshTokenExpirationInMs);
   }
 
   @Override
@@ -58,6 +58,17 @@ public class JWTServiceImpl implements JWTService {
 
     String username = extractUsername(token);
     return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+  }
+
+  private String buildJWTToken(Map<String, Object> extractClaims, UserDetails userDetails, long expiration) {
+
+    return Jwts.builder()
+        .setClaims(extractClaims)
+        .setSubject(userDetails.getUsername())
+        .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + expiration))
+        .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+        .compact();
   }
 
   private boolean isTokenExpired(String token) {

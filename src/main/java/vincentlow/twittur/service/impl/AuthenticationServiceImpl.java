@@ -19,7 +19,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.google.common.net.HttpHeaders;
+
 import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ErrorCode;
 import vincentlow.twittur.model.constant.ExceptionMessage;
@@ -41,6 +44,8 @@ import vincentlow.twittur.utils.StringUtil;
 @Slf4j
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+  private final String STARTS_WITH_BEARER = "Bearer "; // including space
 
   @Autowired
   private AccountRepositoryService accountRepositoryService;
@@ -94,11 +99,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     accountRepositoryService.save(account);
 
-    String jwtToken = jwtService.generateToken(account);
-    saveAccountToken(account, jwtToken, now);
+    String accessToken = jwtService.generateAccessToken(account);
+    String refreshToken = jwtService.generateRefreshToken(account);
+
+    saveAccountToken(account, accessToken, now);
 
     return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
         .build();
   }
 
@@ -111,18 +119,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       Account account =
           accountRepositoryService.findByUsernameOrEmailAddressAndMarkForDeleteFalse(request.getUsername());
-      String jwtToken = jwtService.generateToken(account);
+      String accessToken = jwtService.generateAccessToken(account);
+      String refreshToken = jwtService.generateRefreshToken(account);
 
-      revokeAllAccountToken(account); // Don't want multiple valid tokens when login
-      saveAccountToken(account, jwtToken, LocalDateTime.now());
+      revokeAllAccountToken(account);
+      saveAccountToken(account, accessToken, LocalDateTime.now());
 
       return AuthenticationResponse.builder()
-          .accessToken(jwtToken)
+          .accessToken(accessToken)
+          .refreshToken(refreshToken)
           .build();
     } catch (AuthenticationException e) {
       log.error("#login ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new ForbiddenException(e.getMessage());
     }
+  }
+
+  @Override
+  public AuthenticationResponse refreshToken(HttpServletRequest request) {
+
+    String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+    if (Objects.nonNull(authHeader) && authHeader.startsWith(STARTS_WITH_BEARER)) {
+      String refreshToken = authHeader.substring(STARTS_WITH_BEARER.length());
+      String username = jwtService.extractUsername(refreshToken);
+
+      if (Objects.nonNull(username)) {
+        Account account = accountRepositoryService.findByUsernameOrEmailAddressAndMarkForDeleteFalse(username);
+
+        if (jwtService.isTokenValid(refreshToken, account)) {
+          String accessToken = jwtService.generateAccessToken(account);
+          revokeAllAccountToken(account);
+          saveAccountToken(account, accessToken, LocalDateTime.now());
+
+          return AuthenticationResponse.builder()
+              .accessToken(accessToken)
+              .refreshToken(refreshToken)
+              .build();
+        }
+      }
+    }
+    throw new ForbiddenException(ExceptionMessage.AUTHENTICATION_FAILED);
   }
 
   private void validateRequest(CreateAccountRequest request) {
@@ -200,7 +237,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     tokenRepository.save(token);
   }
 
-  private void revokeAllAccountToken(Account account) {
+  private void revokeAllAccountToken(Account account) { // Don't want multiple valid tokens
 
     List<Token> validAccountTokens = tokenRepository.findAllValidTokensByAccountId(account.getId());
     if (!validAccountTokens.isEmpty()) {

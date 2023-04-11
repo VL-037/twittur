@@ -71,6 +71,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
   private boolean isTokenValid(Token token) {
 
-    return !token.isExpired() && !token.isRevoked();
+    return Objects.nonNull(token) && !token.isExpired() && !token.isRevoked();
   }
 }

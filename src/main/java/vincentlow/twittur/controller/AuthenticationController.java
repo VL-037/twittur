@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import vincentlow.twittur.model.constant.ApiPath;
 import vincentlow.twittur.model.request.CreateAccountRequest;
@@ -26,7 +27,8 @@ public class AuthenticationController extends BaseController {
   public ApiSingleResponse<AuthenticationResponse> register(@RequestBody CreateAccountRequest request) {
 
     try {
-      return toSuccessApiResponse(authenticationService.register(request));
+      AuthenticationResponse response = authenticationService.register(request);
+      return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
       log.error("#register ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -37,9 +39,22 @@ public class AuthenticationController extends BaseController {
   public ApiSingleResponse<AuthenticationResponse> login(@RequestBody LoginRequest request) {
 
     try {
-      return toSuccessApiResponse(authenticationService.login(request));
+      AuthenticationResponse response = authenticationService.login(request);
+      return toSuccessApiResponse(response);
     } catch (RuntimeException e) {
       log.error("#login ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  @PostMapping("/refresh-token")
+  public ApiSingleResponse<AuthenticationResponse> refreshToken(HttpServletRequest request) { // to read Header
+
+    try {
+      AuthenticationResponse response = authenticationService.refreshToken(request);
+      return toSuccessApiResponse(response);
+    } catch (RuntimeException e) {
+      log.error("#refreshToken ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
     }
   }

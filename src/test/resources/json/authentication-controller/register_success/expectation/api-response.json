@@ -2,6 +2,7 @@
   "code": 200,
   "status": "OK",
   "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzbWFydGRyYXd3d3czIiwiaWF0IjoxNjgxMjI2NjQ0LCJleHAiOjE2ODE4MzE0NDR9._nFez135JJfDaUHmw5JjBW24ylFwobKlg0PzeoGohD4"
   }
 }
