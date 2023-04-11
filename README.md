@@ -15,7 +15,7 @@
 ## Features
 
 - Project
-  - Register, Login, Logout
+  - Register, Login, Logout, Refresh Token
   - Get, Update `Account` 
   - Follow, Unfollow `Account`
   - Create, Get, Update, Delete `Tweet`
