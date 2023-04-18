@@ -72,6 +72,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       redis:
         condition: service_healthy
