@@ -67,6 +67,8 @@
 
 ## Run Project with Docker
 
+- Make sure you have `target` directory and `.jar` file inside.
+- If you don't have `target` directory, you can run `mvn clean install -DskipTests`
 - Update docker-compose environment at [docker-compose.yaml](https://github.com/VL-037/twittur/blob/main/docker-compose.yaml#L73-L75)
 - Run `docker compose up`
 - APIs will be served at [localhost:8080](http://localhost:8080)
