@@ -46,10 +46,6 @@
 - IDE: [Intellij IDEA Community Edition](https://www.jetbrains.com/idea/download)
 - Build tool: [Maven 3.6.3](https://archive.apache.org/dist/maven/maven-3/3.6.3)
 
-## Email Configuration
-
-- fill `spring.mail.username` & `spring.mail.password` with your Google App Passwords credentials
-
 ## Cron Job Configuration
 
 - Update both recipients for [notification](/rundeck/twittur_resendFailedEmails.yaml) with your email
@@ -61,12 +57,17 @@
 - Click on `Action` &rarr; `Upload Definition`
 - Choose `YAML format` and upload job from [/rundeck](/rundeck)
 
+## Email Configuration
+
+- fill `spring.mail.username` & `spring.mail.password` with your Google App Passwords credentials
+
 ## JWT Configuration
 
 - fill `jwt.secret.key` with your secret key. You can visit https://www.allkeysgenerator.com
 
 ## Run Project with Docker
 
+- Update docker-compose environment at [docker-compose.yaml](https://github.com/VL-037/twittur/blob/main/docker-compose.yaml#L73-L75)
 - Run `docker compose up`
 - APIs will be served at [localhost:8080](http://localhost:8080)
 
