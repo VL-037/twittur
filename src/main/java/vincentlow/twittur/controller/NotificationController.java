@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +36,7 @@ public class NotificationController extends BaseController {
   private NotificationService notificationService;
 
   @GetMapping
-  public ApiListResponse<NotificationResponse> getNotifications(
+  public ResponseEntity<ApiListResponse<NotificationResponse>> getNotifications(
       @RequestBody GetNotificationRequest request,
       @RequestParam(defaultValue = "0") int pageNumber) {
 
@@ -49,7 +50,7 @@ public class NotificationController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(notifications, pageNumber, DEFAULT_PAGE_SIZE);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessResponseEntity(toApiListResponse(response, pageMetaData));
     } catch (Exception e) {
       log.error("#getNotifications ERROR! with request: {}, pageNumber: {}, and error: {}", request, pageNumber,
           e.getMessage(), e);
