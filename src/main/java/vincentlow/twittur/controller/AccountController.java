@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,7 @@ public class AccountController extends BaseController {
   private AccountService accountService;
 
   @GetMapping
-  public ApiListResponse<AccountResponse> getAccounts(
+  public ResponseEntity<ApiListResponse<AccountResponse>> getAccounts(
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "10") int pageSize) {
 
@@ -56,7 +57,7 @@ public class AccountController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(accounts, pageNumber, pageSize);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessResponseEntity(toApiListResponse(response, pageMetaData));
     } catch (Exception e) {
       log.error("#getAccounts ERROR! with pageNumber: {}, pageSize: {}, and error: {}", pageNumber, pageSize,
           e.getMessage(), e);
@@ -65,13 +66,14 @@ public class AccountController extends BaseController {
   }
 
   @GetMapping("/@{username}")
-  public ApiSingleResponse<AccountResponse> getAccountByUsername(@PathVariable("username") String username) {
+  public ResponseEntity<ApiSingleResponse<AccountResponse>> getAccountByUsername(
+      @PathVariable("username") String username) {
 
     try {
       Account account = accountService.findAccountByUsername(username);
       AccountResponse response = toResponse(account, AccountResponse.class);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#getAccountByUsername ERROR! with username: {}, and error: {}", username, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -79,12 +81,12 @@ public class AccountController extends BaseController {
   }
 
   @PutMapping("/@{username}")
-  public ApiResponse updateAccount(@PathVariable("username") String username,
+  public ResponseEntity<ApiResponse> updateAccount(@PathVariable("username") String username,
       @RequestBody UpdateAccountRequest request) {
 
     try {
       accountService.updateAccountByUsername(username, request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#updateAccount ERROR! with username: {}, request: {}, and error: {}", username, request,
           e.getMessage(), e);
@@ -93,12 +95,12 @@ public class AccountController extends BaseController {
   }
 
   @PutMapping("/@{username}/emailAddress")
-  public ApiResponse updateAccountEmail(@PathVariable("username") String username,
+  public ResponseEntity<ApiResponse> updateAccountEmail(@PathVariable("username") String username,
       @RequestBody UpdateAccountEmailRequest request) {
 
     try {
       accountService.updateAccountEmailAddressByUsername(username, request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#updateAccountEmail ERROR! with username: {}, request: {}, and error: {}", username, request,
           e.getMessage(), e);
@@ -107,12 +109,12 @@ public class AccountController extends BaseController {
   }
 
   @PutMapping("/@{username}/phoneNumber")
-  public ApiResponse updateAccountPhoneNumber(@PathVariable("username") String username,
+  public ResponseEntity<ApiResponse> updateAccountPhoneNumber(@PathVariable("username") String username,
       @RequestBody UpdateAccountPhoneNumberRequest request) {
 
     try {
       accountService.updateAccountPhoneNumberByUsername(username, request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#updateAccountPhoneNumber ERROR! with username: {}, request: {}, and error: {}", username, request,
           e.getMessage(), e);
@@ -121,12 +123,12 @@ public class AccountController extends BaseController {
   }
 
   @PutMapping("/@{username}/password")
-  public ApiResponse updateAccountPassword(@PathVariable("username") String username,
+  public ResponseEntity<ApiResponse> updateAccountPassword(@PathVariable("username") String username,
       @RequestBody UpdateAccountPasswordRequest request) {
 
     try {
       accountService.updateAccountPasswordByUsername(username, request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#updateAccountPassword ERROR! with username: {}, request: {}, and error: {}", username, request,
           e.getMessage(), e);
@@ -135,11 +137,11 @@ public class AccountController extends BaseController {
   }
 
   @PostMapping("/init")
-  public ApiResponse initDummyAccounts() {
+  public ResponseEntity<ApiResponse> initDummyAccounts() {
 
     try {
       accountService.initDummyAccounts();
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#initDummyAccounts ERROR! with error: {}", e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -147,11 +149,11 @@ public class AccountController extends BaseController {
   }
 
   @PostMapping("/_follow")
-  public ApiResponse followAccount(@RequestBody AccountRelationshipRequest request) {
+  public ResponseEntity<ApiResponse> followAccount(@RequestBody AccountRelationshipRequest request) {
 
     try {
       accountService.follow(request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#followAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -159,11 +161,11 @@ public class AccountController extends BaseController {
   }
 
   @PostMapping("/_unfollow")
-  public ApiResponse unfollowAccount(@RequestBody AccountRelationshipRequest request) {
+  public ResponseEntity<ApiResponse> unfollowAccount(@RequestBody AccountRelationshipRequest request) {
 
     try {
       accountService.unfollow(request);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#unfollowAccount ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -184,7 +186,7 @@ public class AccountController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(followers, pageNumber, pageSize);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toApiListResponse(response, pageMetaData);
     } catch (RuntimeException e) {
       log.error("#getAccountFollowers ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
           pageNumber, pageSize, e.getMessage(), e);
@@ -206,7 +208,7 @@ public class AccountController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(followers, pageNumber, pageSize);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toApiListResponse(response, pageMetaData);
     } catch (RuntimeException e) {
       log.error("#getAccountFollowing ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
           pageNumber, pageSize, e.getMessage(), e);

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,14 +39,14 @@ public class DirectMessageController extends BaseController {
   private DirectMessageService directMessageService;
 
   @PostMapping("/{senderId}/{recipientId}")
-  public ApiSingleResponse<DirectMessageResponse> sendDirectMessage(@PathVariable String senderId,
+  public ResponseEntity<ApiSingleResponse<DirectMessageResponse>> sendDirectMessage(@PathVariable String senderId,
       @PathVariable String recipientId, @RequestBody DirectMessageRequest request) {
 
     try {
       DirectMessage directMessage = directMessageService.sendMessage(senderId, recipientId, request);
       DirectMessageResponse response = toDirectMessageResponse(directMessage);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (Exception e) {
       log.error("#sendDirectMessage ERROR! with senderId: {}, recipientId: {}, request: {}, and error: {}", senderId,
           recipientId, request, e.getMessage(), e);
@@ -54,7 +55,7 @@ public class DirectMessageController extends BaseController {
   }
 
   @GetMapping("/{senderId}/{recipientId}")
-  public ApiListResponse<DirectMessageResponse> getDirectMessages(@PathVariable String senderId,
+  public ResponseEntity<ApiListResponse<DirectMessageResponse>> getDirectMessages(@PathVariable String senderId,
       @PathVariable String recipientId,
       @RequestParam(defaultValue = "0") int pageNumber) {
 
@@ -68,7 +69,7 @@ public class DirectMessageController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(directMessages, pageNumber, DEFAULT_PAGE_SIZE);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessResponseEntity(toApiListResponse(response, pageMetaData));
     } catch (Exception e) {
       log.error("#getDirectMessages ERROR! with senderId: {}, recipientId: {}, pageNumber: {}, and error: {}", senderId,
           recipientId, pageNumber, e.getMessage(), e);

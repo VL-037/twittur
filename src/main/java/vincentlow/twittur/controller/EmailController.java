@@ -4,6 +4,7 @@ import static vincentlow.twittur.utils.ObjectMappingHelper.toResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,13 +27,13 @@ public class EmailController extends BaseController {
   private EmailService emailService;
 
   @PostMapping
-  private ApiSingleResponse<EmailResponse> sendEmail(@RequestBody EmailRequest request) {
+  private ResponseEntity<ApiSingleResponse<EmailResponse>> sendEmail(@RequestBody EmailRequest request) {
 
     try {
       Email email = emailService.sendEmail(request);
       EmailResponse response = toResponse(email, EmailResponse.class);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#sendEmail ERROR! with request: {}, and error: {}", request, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);

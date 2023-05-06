@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import vincentlow.twittur.model.response.api.ApiListResponse;
 import vincentlow.twittur.model.response.api.ApiResponse;
@@ -14,12 +15,12 @@ public class BaseController {
 
   protected ApiResponse successResponse = new ApiResponse(HttpStatus.OK, null);
 
-  protected <T> ApiSingleResponse toSuccessApiResponse(T data) {
+  protected <T> ApiSingleResponse toApiSingleResponse(T data) {
 
     return new ApiSingleResponse(HttpStatus.OK, null, data);
   }
 
-  protected <T> ApiListResponse toSuccessApiResponse(List<T> content, PageMetaData pageMetaData) {
+  protected <T> ApiListResponse toApiListResponse(List<T> content, PageMetaData pageMetaData) {
 
     return new ApiListResponse(HttpStatus.OK, null, content, pageMetaData);
   }
@@ -27,6 +28,26 @@ public class BaseController {
   protected ApiResponse toErrorApiResponse(HttpStatus httpStatus, String error) {
 
     return new ApiResponse(httpStatus, error);
+  }
+
+  protected <T> ResponseEntity toSuccessResponseEntity(ApiResponse apiResponse) {
+
+    return new ResponseEntity(apiResponse, HttpStatus.OK);
+  }
+
+  protected <T> ResponseEntity toSuccessResponseEntity(ApiSingleResponse singleResponse) {
+
+    return new ResponseEntity(singleResponse, HttpStatus.OK);
+  }
+
+  protected <T> ResponseEntity toSuccessResponseEntity(ApiListResponse listResponse) {
+
+    return new ResponseEntity(listResponse, HttpStatus.OK);
+  }
+
+  protected <T> ResponseEntity toErrorResponseEntity(ApiResponse apiResponse, HttpStatus httpStatus) {
+
+    return new ResponseEntity(apiResponse, httpStatus);
   }
 
   protected PageMetaData getPageMetaData(Page page, int pageNumber, int pageSize) {

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +41,7 @@ public class TweetController extends BaseController {
   private TweetService tweetService;
 
   @GetMapping
-  public ApiListResponse<TweetResponse> getAccountTweets(@PathVariable String username,
+  public ResponseEntity<ApiListResponse<TweetResponse>> getAccountTweets(@PathVariable String username,
       @RequestParam(defaultValue = "0") int pageNumber,
       @RequestParam(defaultValue = "5") int pageSize) {
 
@@ -53,7 +54,7 @@ public class TweetController extends BaseController {
           .collect(Collectors.toList());
       PageMetaData pageMetaData = getPageMetaData(tweets, pageNumber, pageSize);
 
-      return toSuccessApiResponse(response, pageMetaData);
+      return toSuccessResponseEntity(toApiListResponse(response, pageMetaData));
     } catch (RuntimeException e) {
       log.error("#getAccountTweets ERROR! with username: {}, pageNumber: {}, pageSize: {}, and error: {}", username,
           pageNumber, pageSize, e.getMessage(), e);
@@ -62,14 +63,14 @@ public class TweetController extends BaseController {
   }
 
   @GetMapping("/{tweetId}")
-  public ApiSingleResponse<TweetResponse> getAccountTweetById(@PathVariable String username,
+  public ResponseEntity<ApiSingleResponse<TweetResponse>> getAccountTweetById(@PathVariable String username,
       @PathVariable String tweetId) {
 
     try {
       Tweet tweet = tweetService.findAccountTweetById(username, tweetId);
       TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#getAccountTweetById ERROR! with username: {}, tweetId: {}, and error: {}", username,
           tweetId, e.getMessage(), e);
@@ -78,14 +79,14 @@ public class TweetController extends BaseController {
   }
 
   @PostMapping
-  public ApiSingleResponse<TweetResponse> postTweet(@PathVariable String username,
+  public ResponseEntity<ApiSingleResponse<TweetResponse>> postTweet(@PathVariable String username,
       @RequestBody CreateTweetRequest request) {
 
     try {
       Tweet tweet = tweetService.createTweet(username, request);
       TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#postTweet ERROR! with username: {}, request: {}, and error: {}", username,
           request, e.getMessage(), e);
@@ -94,11 +95,11 @@ public class TweetController extends BaseController {
   }
 
   @PostMapping("/init")
-  public ApiResponse initDummyTweets(@PathVariable String username) {
+  public ResponseEntity<ApiResponse> initDummyTweets(@PathVariable String username) {
 
     try {
       tweetService.initDummyTweets(username);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#initDummyTweets ERROR! with username: {}, and error: {}", username, e.getMessage(), e);
       throw new RuntimeException(e.getMessage(), e);
@@ -106,7 +107,7 @@ public class TweetController extends BaseController {
   }
 
   @PutMapping("/{tweetId}")
-  public ApiSingleResponse<TweetResponse> updateAccountTweet(@PathVariable String username,
+  public ResponseEntity<ApiSingleResponse<TweetResponse>> updateAccountTweet(@PathVariable String username,
       @PathVariable String tweetId,
       @RequestBody UpdateTweetRequest request) {
 
@@ -114,7 +115,7 @@ public class TweetController extends BaseController {
       Tweet tweet = tweetService.updateAccountTweet(username, tweetId, request);
       TweetResponse response = toResponse(tweet, TweetResponse.class);
 
-      return toSuccessApiResponse(response);
+      return toSuccessResponseEntity(toApiSingleResponse(response));
     } catch (RuntimeException e) {
       log.error("#updateAccountTweet ERROR! with username: {}, tweetId: {}, request: {}, and error: {}", username,
           tweetId, request, e.getMessage(), e);
@@ -123,11 +124,11 @@ public class TweetController extends BaseController {
   }
 
   @DeleteMapping("/{tweetId}")
-  public ApiResponse deleteAccountTweet(@PathVariable String username, @PathVariable String tweetId) {
+  public ResponseEntity<ApiResponse> deleteAccountTweet(@PathVariable String username, @PathVariable String tweetId) {
 
     try {
       tweetService.deleteAccountTweet(username, tweetId);
-      return successResponse;
+      return toSuccessResponseEntity(successResponse);
     } catch (RuntimeException e) {
       log.error("#deleteAccountTweet ERROR! with username: {}, tweetId: {}, and error: {}", username,
           tweetId, e.getMessage(), e);

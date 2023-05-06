@@ -69,7 +69,7 @@ public class BaseControllerTest {
   @Test
   void toSuccessApiResponse_apiListResponse() {
 
-    ApiListResponse result = baseController.toSuccessApiResponse(accountList, pageMetaData);
+    ApiListResponse result = baseController.toApiListResponse(accountList, pageMetaData);
 
     assertNotNull(result);
     assertEquals(HttpStatus.OK.value(), result.getCode());
@@ -80,7 +80,7 @@ public class BaseControllerTest {
   @Test
   void toSuccessApiResponse_apiSingleResponse() {
 
-    ApiSingleResponse result = baseController.toSuccessApiResponse(account);
+    ApiSingleResponse result = baseController.toApiSingleResponse(account);
 
     assertNotNull(result);
     assertEquals(HttpStatus.OK.value(), result.getCode());

@@ -2,6 +2,7 @@ package vincentlow.twittur.controller;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,38 +19,41 @@ import vincentlow.twittur.model.response.exception.ServiceUnavailableException;
 @RestControllerAdvice
 public class ExceptionController extends BaseController {
 
-  @ExceptionHandler
-  public ApiResponse handleBadRequestException(BadRequestException ex) {
+  @ExceptionHandler(value = {BadRequestException.class})
+  public ResponseEntity<ApiResponse> handleBadRequestException(BadRequestException ex) {
 
     log.error("#handleBadRequestException ERROR! with error: {}", ex.getMessage());
-    return toErrorApiResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    return toErrorResponseEntity(toErrorApiResponse(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
   }
 
   @ExceptionHandler(value = {AuthenticationException.class})
-  public ApiResponse handleAuthenticationException(AuthenticationException ex) {
+  public ResponseEntity handleAuthenticationException(AuthenticationException ex) {
 
     log.error("#handleAuthenticationException ERROR! with error: {}", ex.getMessage());
-    return toErrorApiResponse(HttpStatus.FORBIDDEN, ExceptionMessage.AUTHENTICATION_FAILED);
+    return toErrorResponseEntity(toErrorApiResponse(HttpStatus.FORBIDDEN, ExceptionMessage.AUTHENTICATION_FAILED),
+        HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(value = {NotFoundException.class})
-  public ApiResponse handleNotFoundException(NotFoundException ex) {
+  public ResponseEntity handleNotFoundException(NotFoundException ex) {
 
     log.error("#handleNotFoundException ERROR! with error: {}", ex.getMessage());
-    return toErrorApiResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    return toErrorResponseEntity(toErrorApiResponse(HttpStatus.NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(value = {ConflictException.class})
-  public ApiResponse handleConflictException(ConflictException ex) {
+  public ResponseEntity handleConflictException(ConflictException ex) {
 
     log.error("#handleConflictException ERROR! with error: {}", ex.getMessage());
-    return toErrorApiResponse(HttpStatus.CONFLICT, ex.getMessage());
+    return toErrorResponseEntity(toErrorApiResponse(HttpStatus.CONFLICT, ex.getMessage()), HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler(value = {DataAccessException.class, ServiceUnavailableException.class})
-  public ApiResponse handleServiceUnavailableException(RuntimeException ex) {
+  public ResponseEntity handleServiceUnavailableException(RuntimeException ex) {
 
     log.error("#handleServiceUnavailableException ERROR! with error: {}", ex.getMessage());
-    return toErrorApiResponse(HttpStatus.SERVICE_UNAVAILABLE, ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE);
+    return toErrorResponseEntity(
+        toErrorApiResponse(HttpStatus.SERVICE_UNAVAILABLE, ExceptionMessage.SERVICE_TEMPORARILY_UNAVAILABLE),
+        HttpStatus.SERVICE_UNAVAILABLE);
   }
 }
