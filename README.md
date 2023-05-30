@@ -63,6 +63,7 @@
 
 ## Email Configuration
 
+- temporary disable your `anti-virus`
 - fill `spring.mail.username` & `spring.mail.password` with your Google App Passwords credentials
 
 ## JWT Configuration
